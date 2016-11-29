@@ -52,7 +52,7 @@ protected:
   void  append_child(Widget*  child, const IconModule&  a, const IconModule&  b);
 
 public:
-  CheckForm(std::initializer_list<Widget*>  ls={});
+   CheckForm(std::initializer_list<Widget*>  ls={}, Callback  cb=nullptr);
   ~CheckForm();
 
 
@@ -71,7 +71,7 @@ class
 RadioForm: public CheckForm
 {
 public:
-  RadioForm(std::initializer_list<Widget*>  ls, int  initial_i=0);
+  RadioForm(std::initializer_list<Widget*>  ls, Callback  cb=nullptr, int  initial_i=0);
 
 
   void  append(Widget*  child) override;

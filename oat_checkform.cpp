@@ -11,9 +11,9 @@ namespace oat{
 
 
 CheckForm::
-CheckForm(std::initializer_list<Widget*>  ls):
+CheckForm(std::initializer_list<Widget*>  ls, Callback  cb):
 last_index(-1),
-callback(nullptr)
+callback(cb)
 {
   TableElement::append(ls);
 }
@@ -133,11 +133,13 @@ process_mouse(const Mouse&  mouse)
 
 
 RadioForm::
-RadioForm(std::initializer_list<Widget*>  ls, int  initial_i)
+RadioForm(std::initializer_list<Widget*>  ls, Callback  cb, int  initial_i)
 {
   TableElement::append(ls);
 
   last_index = initial_i;
+
+  callback = cb;
 
   members[initial_i]->icon->change_current(1);
 }
