@@ -38,7 +38,6 @@ chip_point;
 
 
 int  process;
-int  display_phase = 8;
 int  index;
 
 
@@ -207,46 +206,11 @@ change_process(int  v)
 {
   process = v;
 
-  display_phase = 8;
-
   set_modified_flag(Update::table_flag);
 }
 
 
 int  get_process(){return process;}
-
-
-void
-step_display()
-{
-    if(display_phase > 0)
-    {
-      display_phase -= 1;
-
-        if(!display_phase)
-        {
-          display_phase = -20;
-
-          set_modified_flag(Update::table_flag);
-        }
-    }
-
-  else
-    if(display_phase < 0)
-    {
-      display_phase += 1;
-
-        if(!display_phase)
-        {
-          display_phase = 4;
-
-          set_modified_flag(Update::table_flag);
-        }
-    }
-}
-
-
-bool  test_display(){return(display_phase > 0);}
 
 
 void  set_modified_flag(int  flag){modified_flags |= flag;}

@@ -10,7 +10,7 @@ Editor()
   change_content_width( core::chip_size*core::table_size);
   change_content_height(core::chip_size*core::table_size);
 
-  style.background_color = oat::const_color::blue;
+  style.background_color = oat::const_color::green;
 }
 
 
@@ -86,6 +86,109 @@ draw_digit(int  d, const oat::Color&  color, int  x, int  y)
 
 void
 Editor::
+draw_chip(const oat::Point&  chip_point, int  x_base, int  y_base)
+{
+    for(int  yy = 0;  yy < core::chip_size;  yy += 1){
+    for(int  xx = 0;  xx < core::chip_size;  xx += 1){
+      oat::Color  color;
+
+        if(core::get_image_pixel(color,core::chip_size*chip_point.x+xx,
+                                       core::chip_size*chip_point.y+yy))
+        {
+          draw_dot(color,x_base+xx,
+                         y_base+yy);
+        }
+    }}
+}
+
+
+void
+Editor::
+draw_attribute(int  attr, int  x_base, int  y_base)
+{
+  fill_rect(oat::const_color::white,x_base+4,
+                                    y_base+12,16,8);
+
+  auto  d = (attr&0x7F);
+
+  auto  color = (attr&enterable_flag)? oat::const_color::blue
+                                     : oat::const_color::red;
+
+  int  d1 = d/10;
+
+  d %= 10;
+
+  draw_digit(d1,color,x_base+4,
+                      y_base+12);
+
+  draw_digit(d ,color,x_base+12,
+                      y_base+12);
+  draw_digit(d ,color,x_base+12,
+                      y_base+12);
+}
+
+
+void
+Editor::
+draw_bg1()
+{
+  auto  pt = content.point;
+
+    for(int  y = 0;  y < core::table_size;  y += 1){
+    for(int  x = 0;  x < core::table_size;  x += 1){
+      auto&  sq = core::get_square(x,y);
+
+      draw_chip(sq.lower,
+                pt.x+core::chip_size*x,
+                pt.y+core::chip_size*y);
+    }}
+}
+
+
+void
+Editor::
+draw_bg2(bool  with_attribute)
+{
+  auto  pt = content.point;
+
+    for(int  y = 0;  y < core::table_size;  y += 1){
+    for(int  x = 0;  x < core::table_size;  x += 1){
+      auto&  sq = core::get_square(x,y);
+
+      const int  x_base = pt.x+core::chip_size*x;
+      const int  y_base = pt.y+core::chip_size*y;
+
+      draw_chip(sq.lower,x_base,y_base);
+      draw_chip(sq.upper,x_base,y_base);
+
+        if(with_attribute)
+        {
+          draw_attribute(sq.attribute,x_base,y_base);
+        }
+   }}
+}
+
+
+void
+Editor::
+draw_bg3()
+{
+  auto  pt = content.point;
+
+    for(int  y = 0;  y < core::table_size;  y += 1){
+    for(int  x = 0;  x < core::table_size;  x += 1){
+      auto&  sq = core::get_square(x,y);
+
+      const int  x_base = pt.x+core::chip_size*x;
+      const int  y_base = pt.y+core::chip_size*y;
+
+      draw_attribute(sq.attribute,x_base,y_base);
+   }}
+}
+
+
+void
+Editor::
 render()
 {
   fill();
@@ -94,91 +197,21 @@ render()
 
   auto  prc = core::get_process();
 
-  auto  v = core::test_display();
+    if(prc == core::Process::arrange_lower_chip)
+    {
+      draw_bg1();
+    }
 
-    for(int  y = 0;  y < core::table_size;  y += 1){
-    for(int  x = 0;  x < core::table_size;  x += 1){
-      auto&  sq = core::get_square(x,y);
+  else
+    if(prc == core::Process::arrange_upper_chip)
+    {
+      draw_bg2(false); 
+    }
 
-        if(prc == core::Process::arrange_lower_chip)
-        {
-            for(int  yy = 0;  yy < core::chip_size;  yy += 1){
-            for(int  xx = 0;  xx < core::chip_size;  xx += 1){
-              oat::Color  color;
-
-                if(core::get_image_pixel(color,core::chip_size*sq.lower.x+xx,
-                                               core::chip_size*sq.lower.y+yy))
-                {
-                  draw_dot(color,pt.x+core::chip_size*x+xx,
-                                 pt.y+core::chip_size*y+yy);
-                }
-
-
-                if(v && sq.upper.x && sq.upper.y)
-                {
-                    if(core::get_image_pixel(color,core::chip_size*sq.upper.x+xx,
-                                                   core::chip_size*sq.upper.y+yy))
-                    {
-                      draw_dot(color,pt.x+core::chip_size*x+xx,
-                                     pt.y+core::chip_size*y+yy);
-                    }
-               }
-            }}
-        }
-
-      else
-        if((prc == core::Process::arrange_upper_chip) ||
-           (v && (prc == core::Process::change_attribute)))
-        {
-            for(int  yy = 0;  yy < core::chip_size;  yy += 1){
-            for(int  xx = 0;  xx < core::chip_size;  xx += 1){
-              oat::Color  color;
-
-                if(core::get_image_pixel(color,core::chip_size*sq.lower.x+xx,
-                                               core::chip_size*sq.lower.y+yy))
-                {
-                  draw_dot(color,pt.x+core::chip_size*x+xx,
-                                 pt.y+core::chip_size*y+yy);
-                }
-
-
-                if(sq.upper.x && sq.upper.y)
-                {
-                    if(core::get_image_pixel(color,core::chip_size*sq.upper.x+xx,
-                                                   core::chip_size*sq.upper.y+yy))
-                    {
-                      draw_dot(color,pt.x+core::chip_size*x+xx,
-                                     pt.y+core::chip_size*y+yy);
-                    }
-                }
-            }}
-        }
-
-      else
-        {
-          auto  d = (sq.attribute&0x7F);
-
-          auto  color0 = (sq.attribute&enterable_flag)? oat::const_color::white
-                                                      : oat::const_color::black;
-
-          auto  color1 = (sq.attribute&enterable_flag)? oat::const_color::black
-                                                      : oat::const_color::white;
-
-          fill_rect(color0,pt.x+core::chip_size*x,
-                           pt.y+core::chip_size*y,
-                           core::chip_size,
-                           core::chip_size);
-
-          int  d1 = d/10;
-
-          d %= 10;
-
-          draw_digit(d1,color1,pt.x+core::chip_size*x+4,
-                               pt.y+core::chip_size*y+12);
-          draw_digit(d ,color1,pt.x+core::chip_size*x+12,
-                               pt.y+core::chip_size*y+12);
-        }
-    }}
+  else
+    {
+      draw_bg2(true); 
+    }
 
 
   draw_rect(oat::const_color::red,pt.x+(core::chip_size*cursor.x),

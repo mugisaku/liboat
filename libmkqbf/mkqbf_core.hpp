@@ -62,8 +62,8 @@ oat::Point     get_chip_point();
 void  change_process(int  v);
 int      get_process();
 
-void  step_display();
-bool  test_display();
+void  change_display(bool  v);
+bool    test_display();
 
 void  set_modified_flag(int  flag);
 int   get_modified_flags();

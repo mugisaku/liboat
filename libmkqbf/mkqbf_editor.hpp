@@ -14,6 +14,12 @@ Editor: public oat::Widget
 
   void  draw_digit(int  d, const oat::Color&  color, int  x, int  y);
 
+  void  draw_chip(const oat::Point&  chip_point, int  x_base, int  y_base);
+  void  draw_attribute(int  attr, int  x_base, int  y_base);
+  void  draw_bg1();
+  void  draw_bg2(bool  with_attribute);
+  void  draw_bg3();
+
 public:
   Editor();
 

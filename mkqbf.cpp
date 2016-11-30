@@ -207,8 +207,6 @@ main_loop()
     {
       next_time = now+60;
 
-      core::step_display();
-
       auto  v = core::get_modified_flags();
 
         if(v&core::Update::table_flag){editor->need_to_redraw();}
