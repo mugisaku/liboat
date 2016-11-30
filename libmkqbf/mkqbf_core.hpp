@@ -49,7 +49,7 @@ Square&  get_square(int  x, int  y);
 
 void  change_square(int  x, int  y, bool  flag);
 
-const oat::Color&  get_image_pixel(int  x, int  y);
+bool  get_image_pixel(oat::Color&  color, int  x, int  y);
 
 
 void  change_index(int  v);

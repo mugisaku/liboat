@@ -104,20 +104,25 @@ render()
         {
             for(int  yy = 0;  yy < core::chip_size;  yy += 1){
             for(int  xx = 0;  xx < core::chip_size;  xx += 1){
-              auto&  color = core::get_image_pixel(core::chip_size*sq.lower.x+xx,
-                                                   core::chip_size*sq.lower.y+yy);
+              oat::Color  color;
 
-              draw_dot(color,pt.x+core::chip_size*x+xx,
-                             pt.y+core::chip_size*y+yy);
-
-                if(v && sq.upper.x && sq.upper.y)
+                if(core::get_image_pixel(color,core::chip_size*sq.lower.x+xx,
+                                               core::chip_size*sq.lower.y+yy))
                 {
-                  auto&  color = core::get_image_pixel(core::chip_size*sq.upper.x+xx,
-                                                       core::chip_size*sq.upper.y+yy);
-
                   draw_dot(color,pt.x+core::chip_size*x+xx,
                                  pt.y+core::chip_size*y+yy);
                 }
+
+
+                if(v && sq.upper.x && sq.upper.y)
+                {
+                    if(core::get_image_pixel(color,core::chip_size*sq.upper.x+xx,
+                                                   core::chip_size*sq.upper.y+yy))
+                    {
+                      draw_dot(color,pt.x+core::chip_size*x+xx,
+                                     pt.y+core::chip_size*y+yy);
+                    }
+               }
             }}
         }
 
@@ -127,19 +132,24 @@ render()
         {
             for(int  yy = 0;  yy < core::chip_size;  yy += 1){
             for(int  xx = 0;  xx < core::chip_size;  xx += 1){
-              auto&  color0 = core::get_image_pixel(core::chip_size*sq.lower.x+xx,
-                                                    core::chip_size*sq.lower.y+yy);
+              oat::Color  color;
 
-              draw_dot(color0,pt.x+core::chip_size*x+xx,
-                              pt.y+core::chip_size*y+yy);
+                if(core::get_image_pixel(color,core::chip_size*sq.lower.x+xx,
+                                               core::chip_size*sq.lower.y+yy))
+                {
+                  draw_dot(color,pt.x+core::chip_size*x+xx,
+                                 pt.y+core::chip_size*y+yy);
+                }
+
 
                 if(sq.upper.x && sq.upper.y)
                 {
-                  auto&  color1 = core::get_image_pixel(core::chip_size*sq.upper.x+xx,
-                                                        core::chip_size*sq.upper.y+yy);
-
-                  draw_dot(color1,pt.x+core::chip_size*x+xx,
-                                  pt.y+core::chip_size*y+yy);
+                    if(core::get_image_pixel(color,core::chip_size*sq.upper.x+xx,
+                                                   core::chip_size*sq.upper.y+yy))
+                    {
+                      draw_dot(color,pt.x+core::chip_size*x+xx,
+                                     pt.y+core::chip_size*y+yy);
+                    }
                 }
             }}
         }

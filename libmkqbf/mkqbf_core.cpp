@@ -186,7 +186,21 @@ change_index(int  v)
 }
 
 
-const oat::Color&  get_image_pixel(int  x, int  y){return image_palette[image_data[y][x]&15];}
+bool
+get_image_pixel(oat::Color&  color, int  x, int  y)
+{
+  auto&  v = image_data[y][x];
+
+    if(v&8)
+    {
+      color = image_palette[v&7];
+
+      return true;
+    }
+
+
+  return false;
+}
 
 void
 change_process(int  v)
@@ -321,21 +335,34 @@ read(const char*  path)
           int  h = fgetc(f);
           int  d = fgetc(f);
 
-          auto   it = &table[0][0];
-          auto  end = &table[h][w];
+          auto  buf = new Square[w*h];
 
-            while(it != end)
+          auto         buf_it = buf;
+          auto  const buf_end = buf+(w*h);
+
+            while(buf_it != buf_end)
             {
-              it->attribute = fgetc(f);
+              buf_it->attribute = fgetc(f);
 
-              it->lower.x = fgetc(f);
-              it->lower.y = fgetc(f);
-              it->upper.x = fgetc(f);
-              it->upper.y = fgetc(f);
+              buf_it->lower.x = fgetc(f);
+              buf_it->lower.y = fgetc(f);
+              buf_it->upper.x = fgetc(f);
+              buf_it->upper.y = fgetc(f);
 
-              it += 1;
+              buf_it += 1;
             }
 
+
+          const int  dst_w = std::min(w,table_size);
+          const int  dst_h = std::min(h,table_size);
+
+            for(int  y = 0;  y < dst_h;  y += 1){
+            for(int  x = 0;  x < dst_w;  x += 1){
+              table[y][x] = buf[(w*y)+x];
+            }}
+
+
+          delete[] buf;
 
           qbf_path = path;
 

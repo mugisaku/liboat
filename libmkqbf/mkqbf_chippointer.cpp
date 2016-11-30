@@ -47,8 +47,13 @@ render()
 
     for(int  y = 0;  y < core::image_size;  y += 1){
     for(int  x = 0;  x < core::image_size;  x += 1){
-      draw_dot(core::get_image_pixel(x,y),pt.x+x,
-                                          pt.y+y);
+      oat::Color  color;
+
+        if(core::get_image_pixel(color,x,y))
+        {
+          draw_dot(color,pt.x+x,
+                         pt.y+y);
+        }
     }}
 
 
