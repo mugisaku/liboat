@@ -352,10 +352,8 @@ draw_rect_safely(const Color& color, int  x, int  y, int  w, int  h, bool  brok)
 
 void
 Widget::
-draw_convex_rect(const Color& color, int  x, int  y, int  w, int  h)
+draw_convex_rect(int  x, int  y, int  w, int  h)
 {
-  fill_rect(color,x,y,w,h);
-
   draw_rect(const_color::white,x,y  ,w,  2);
   draw_rect(const_color::white,x,y+2,2,h-2);
 
@@ -366,10 +364,8 @@ draw_convex_rect(const Color& color, int  x, int  y, int  w, int  h)
 
 void
 Widget::
-draw_concave_rect(const Color& color, int  x, int  y, int  w, int  h)
+draw_concave_rect(int  x, int  y, int  w, int  h)
 {
-  fill_rect(color,x,y,w,h);
-
   draw_rect(const_color::dark_gray,x  ,y  ,w  ,h  );
   draw_rect(const_color::dark_gray,x+1,y+1,w-2,h-2);
 

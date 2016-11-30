@@ -14,6 +14,8 @@ Button::
 Button(Widget*  child, Callback  cb):
 callback(cb)
 {
+  set_flag(terminal_parent_flag);
+
   style.top_margin    = 4;
   style.left_margin   = 4;
   style.right_margin  = 4;
@@ -141,10 +143,10 @@ void
 Button::
 render()
 {
-    if(module.test_pressing()){draw_concave_rect(style.background_color,point.x,point.y,width-2,height-2);}
-  else                        {draw_convex_rect( style.background_color,point.x,point.y,width-2,height-2);}
-
   Container::render();
+
+    if(module.test_pressing()){draw_concave_rect(point.x,point.y,width-2,height-2);}
+  else                        {draw_convex_rect( point.x,point.y,width-2,height-2);}
 }
 
 

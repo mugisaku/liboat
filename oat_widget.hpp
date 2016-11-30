@@ -35,6 +35,8 @@ protected:
 
   void*  userdata;
 
+  std::string  name;
+
 public:
   static constexpr int  hidden_flag                    =  1;
   static constexpr int  needed_to_reform_flag          =  2;
@@ -42,6 +44,7 @@ public:
   static constexpr int  needed_to_redraw_child_flag    =  8;
   static constexpr int  needed_to_redraw_perfect_flag  = 16;
   static constexpr int  size_is_changed_flag           = 32;
+  static constexpr int  terminal_parent_flag           = 64;
 
 
            Widget();
@@ -54,6 +57,8 @@ public:
 
   void   set_userdata(void*  ptr)      ;
   void*  get_userdata(          ) const;
+
+  const std::string&  get_name() const;
 
   Point  get_mouse_point(const Mouse&  mouse) const;
 
@@ -82,8 +87,6 @@ public:
 
   virtual void  process_when_mouse_entered(){};
   virtual void  process_when_mouse_left(){};
-
-  void  ascend_process_mouse(const Mouse&  mouse);
 
   virtual void  render();
   
@@ -114,8 +117,8 @@ public:
 
   void  draw_rect_safely(const Color& color, int  x, int  y, int  w, int  h, bool  brok=false);
 
-  void   draw_convex_rect(const Color& color, int  x, int  y, int  w, int  h);
-  void  draw_concave_rect(const Color& color, int  x, int  y, int  w, int  h);
+  void   draw_convex_rect(int  x, int  y, int  w, int  h);
+  void  draw_concave_rect(int  x, int  y, int  w, int  h);
 
   void  draw_input_form(int  x, int  y, int  w, int  h);
 

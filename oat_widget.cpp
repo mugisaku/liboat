@@ -59,6 +59,7 @@ void   Widget::set_userdata(void*  ptr)      {       userdata = ptr;}
 void*  Widget::get_userdata(          ) const{return userdata      ;}
 
 
+const std::string&  Widget::get_name() const{return name;}
 
 
 const Box&
@@ -232,21 +233,6 @@ try_redraw()
 }
 
 
-
-
-void
-Widget::
-ascend_process_mouse(const Mouse&  mouse)
-{
-  auto  p = parent;
-
-    while(p)
-    {
-      p->process_mouse(mouse);
-
-      p = p->get_parent();
-    }
-}
 
 
 void

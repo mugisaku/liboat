@@ -15,6 +15,8 @@ CheckForm(std::initializer_list<Widget*>  ls, Callback  cb):
 last_index(-1),
 callback(cb)
 {
+  set_flag(terminal_parent_flag);
+
   TableElement::append(ls);
 }
 

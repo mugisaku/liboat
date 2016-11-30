@@ -275,11 +275,10 @@ test_qbf(FILE*  f)
   };
 
 
-report;
     for(int  i = 0;  i < 4;  i += 1)
     {
       auto  c = fgetc(f);
-printf("%c",c);
+
         if(ferror(f) || feof(f) || (c != signature[i]))
         {
           return false;

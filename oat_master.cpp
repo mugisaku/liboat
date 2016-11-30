@@ -49,8 +49,6 @@ process(Mouse&  mouse)
 
           current->process_mouse(mouse);
 
-          current->ascend_process_mouse(mouse);
-
           return;
         }
 
@@ -61,8 +59,6 @@ process(Mouse&  mouse)
             if(res == current)
             {
               current->process_mouse(mouse);
-
-              current->ascend_process_mouse(mouse);
 
               return;
             }
@@ -86,8 +82,6 @@ process(Mouse&  mouse)
           current->process_when_mouse_entered();
 
           current->process_mouse(mouse);
-
-          current->ascend_process_mouse(mouse);
         }
     }
 }

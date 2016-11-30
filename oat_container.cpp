@@ -41,6 +41,12 @@ scan(const Point&  pt)
 {
     if(content.test(pt))
     {
+        if(test_flag(terminal_parent_flag))
+        {
+          return this;
+        }
+
+
         for(auto  child: children)
         {
             if(child && !child->test_flag(hidden_flag))
@@ -53,9 +59,6 @@ scan(const Point&  pt)
                 }
             }
         }
-
-
-      return this;
     }
 
 
@@ -187,6 +190,18 @@ void
 Container::
 process_mouse(const Mouse&  mouse)
 {
+    for(auto  child: children)
+    {
+        if(child && !child->test_flag(hidden_flag))
+        {
+            if(child->scan(mouse.point))
+            {
+              child->process_mouse(mouse);
+
+              break;
+            }
+        }
+    }
 }
 
 
@@ -194,6 +209,13 @@ void
 Container::
 process_when_mouse_entered()
 {
+    for(auto  child: children)
+    {
+        if(child && !child->test_flag(hidden_flag))
+        {
+          child->process_when_mouse_entered();
+        }
+    }
 }
 
 
@@ -201,6 +223,13 @@ void
 Container::
 process_when_mouse_left()
 {
+    for(auto  child: children)
+    {
+        if(child && !child->test_flag(hidden_flag))
+        {
+          child->process_when_mouse_left();
+        }
+    }
 }
 
 
@@ -212,7 +241,10 @@ render()
 {
     for(auto  child: children)
     {
-      child->render();
+        if(child && !child->test_flag(hidden_flag))
+        {
+          child->render();
+        }
     }
 }
 
