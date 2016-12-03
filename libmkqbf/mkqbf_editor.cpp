@@ -111,8 +111,8 @@ draw_attribute(int  attr, int  x_base, int  y_base)
 
   auto  d = (attr&0x7F);
 
-  auto  color = (attr&enterable_flag)? oat::const_color::blue
-                                     : oat::const_color::red;
+  auto  color = (attr&noentry_flag)? oat::const_color::red
+                                   : oat::const_color::blue;
 
   int  d1 = d/10;
 

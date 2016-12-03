@@ -9,7 +9,7 @@
 
 
 
-constexpr int  enterable_flag = 0x80;
+constexpr int  noentry_flag = 0x80;
 
 
 struct
@@ -51,6 +51,7 @@ void  change_square(int  x, int  y, bool  flag);
 
 bool  get_image_pixel(oat::Color&  color, int  x, int  y);
 
+void  clear_attribute_all();
 
 void  change_index(int  v);
 

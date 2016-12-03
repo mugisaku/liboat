@@ -26,6 +26,16 @@ change_i(Dial&  dial, int  old_value)
 
 
 void
+clear_(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      core::clear_attribute_all();
+    }
+}
+
+
+void
 save(Button&  btn)
 {
     if(btn->test_unpressed())
@@ -43,7 +53,8 @@ save(Button&  btn)
 Widget*
 create_manager_widget()
 {
-  auto  btn = new Button(new Text(u"保存"),save);
+  auto      btn = new Button(new Text(u"保存"),save);
+  auto  clr_btn = new Button(new Text(u"全属性をクリア"),clear_);
 
   auto  frm = new RadioForm({new Text(u"下位BGチップを設定"),
                              new Text(u"上位BGチップを設定"),
@@ -53,7 +64,9 @@ create_manager_widget()
 
   dia->set_callback(change_i);
 
-  return new TableColumn({frm,dia,btn});
+  auto  row = new TableRow({frm,clr_btn});
+
+  return new TableColumn({row,dia,btn});
 }
 
 

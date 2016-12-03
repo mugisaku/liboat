@@ -170,7 +170,7 @@ change_square(int  x, int  y, bool  flag)
     {
   case(Process::arrange_lower_chip): table[y][x].lower = chip_point;break;
   case(Process::arrange_upper_chip): table[y][x].upper = chip_point;break;
-  case(Process::change_attribute  ): table[y][x].attribute = flag? (enterable_flag|index):index;break;
+  case(Process::change_attribute  ): table[y][x].attribute = flag? (noentry_flag|index):index;break;
     }
 
 
@@ -200,6 +200,20 @@ get_image_pixel(oat::Color&  color, int  x, int  y)
 
   return false;
 }
+
+
+void
+clear_attribute_all()
+{
+    for(auto&  arr: table){
+    for(auto&  sq: arr){
+      sq.attribute = 0;
+    }}
+
+
+  set_modified_flag(Update::table_flag);
+}
+
 
 void
 change_process(int  v)
