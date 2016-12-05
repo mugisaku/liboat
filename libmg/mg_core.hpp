@@ -33,6 +33,16 @@ constexpr int    patterndisplay_modified_flag = 4;
 constexpr int  animationdisplay_modified_flag = 8;
 
 
+namespace Tool{
+constexpr int  draw_point = 0;
+constexpr int  fill_area  = 1;
+constexpr int  transform_selection_frame = 2;
+constexpr int  paste = 3;
+constexpr int  layer = 4;
+}
+
+
+
 
 void  set_parameter(int  chip_width_, int  chip_height_, int  chip_number_);
 
@@ -55,7 +65,7 @@ int  get_chip_number();
 
 
 void   copy_chip();
-void  paste_chip(bool  overwrite);
+void  paste_chip(int  x, int  y, bool  overwrite);
 void  reverse_chip_horizontally();
 void  reverse_chip_vertically();
 void  mirror_chip_vertically();
@@ -66,6 +76,36 @@ void  shift_chip_down();
 void  clear_chip();
 
 const Frame&  get_frame();
+
+
+namespace selection{
+
+
+struct
+Rect
+{
+  int     top;
+  int    left;
+  int   right;
+  int  bottom;
+
+  Frame  to_frame() const{return Frame{left,top,right-left+1,bottom-top+1};}
+
+};
+
+
+const Rect&  get_rect();
+
+bool  test_whether_transformed();
+
+void  reset();
+
+void  grab(int  x, int  y);
+void  move(int  x, int  y);
+void  release();
+
+}
+
 
 void  change_frame_point(const oat::Point&  pt);
 

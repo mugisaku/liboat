@@ -62,6 +62,7 @@ endif
 OBJ =                     \
   mg_core.o               \
   mg_core__edit.o         \
+  mg_core__selection.o         \
   mg_colorselector.o      \
   mg_motionselector.o     \
   mg_framepositioner.o    \

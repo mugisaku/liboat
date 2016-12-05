@@ -12,6 +12,9 @@ Canvas::
 Canvas(bool  grid_extent_):
 grid_extent(grid_extent_)
 {
+  core::selection::reset();
+
+
   change_content_width( core::get_chip_width() *pixel_size);
   change_content_height(core::get_chip_height()*pixel_size);
 
@@ -32,7 +35,7 @@ process_mouse(const oat::Mouse&  mouse)
 
     switch(core::get_tool_index())
     {
-  case(0):
+  case(core::Tool::draw_point):
         if(mouse.left.test_pressing())
         {
           core::put_pixel(core::get_color_index()|8,x,y);
@@ -44,7 +47,7 @@ process_mouse(const oat::Mouse&  mouse)
           core::put_pixel(0,x,y);
         }
       break;
-  case(1):
+  case(core::Tool::fill_area):
         if(mouse.left.test_pressing())
         {
           core::fill_area(core::get_color_index()|8,x,y);
@@ -56,7 +59,75 @@ process_mouse(const oat::Mouse&  mouse)
           core::fill_area(0,x,y);
         }
       break;
+  case(core::Tool::transform_selection_frame):
+        if(mouse.left.test_pressed())
+        {
+          core::selection::grab(x,y);
+        }
+
+      else
+        if(mouse.left.test_pressing())
+        {
+          core::selection::move(x,y);
+
+          core::set_modified_flag(core::canvas_modified_flag);
+        }
+
+      else
+        if(mouse.right.test_pressing())
+        {
+        }
+      break;
+  case(core::Tool::paste):
+        if(mouse.left.test_pressing())
+        {
+          core::paste_chip(x,y,true);
+        }
+      break;
+  case(core::Tool::layer):
+        if(mouse.left.test_pressing())
+        {
+          core::paste_chip(x,y,false);
+        }
+      break;
     }
+}
+
+
+
+
+void
+Canvas::
+draw_selection_frame()
+{
+  auto&  pt = content.point;
+
+  auto&  rect = core::selection::get_rect();
+
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
+                                     pt.y+(pixel_size*rect.top),
+                                     (pixel_size*((rect.right-rect.left)+1)),
+                                     (pixel_size*((rect.bottom-rect.top)+1)));
+
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
+                                     pt.y+(pixel_size*rect.top),
+                                     pixel_size,
+                                     pixel_size);
+
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.right),
+                                     pt.y+(pixel_size*rect.top),
+                                     pixel_size,
+                                     pixel_size);
+
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
+                                     pt.y+(pixel_size*rect.bottom),
+                                     pixel_size,
+                                     pixel_size);
+
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.right),
+                                     pt.y+(pixel_size*rect.bottom),
+                                     pixel_size,
+                                     pixel_size);
 }
 
 
@@ -116,6 +187,13 @@ render()
                    pt.y+pixel_size*4+1,
                    pixel_size*(w-8),
                    pixel_size*(h-8));
+    }
+
+
+    if((core::get_tool_index() == core::Tool::transform_selection_frame) ||
+       core::selection::test_whether_transformed())
+    {
+      draw_selection_frame();
     }
 }
 

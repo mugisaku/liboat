@@ -137,6 +137,8 @@ set_parameter(int  chip_width_, int  chip_height_, int  chip_number_)
   frame.h = chip_height;
 
   reset_palette();
+
+  selection::reset();
 }
 
 
@@ -187,6 +189,8 @@ get_frame()
 {
   return frame;
 }
+
+
 
 
 void

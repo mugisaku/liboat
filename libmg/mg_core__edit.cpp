@@ -9,20 +9,21 @@ namespace core{
 namespace{
 
 
+Frame  copy_frame;
 std::vector<uint8_t>  copy_buffer;
 
 
 
 std::vector<uint8_t>::const_iterator
-copy()
+copy(const Frame&  frm)
 {
   static std::vector<uint8_t>  buffer;
 
   buffer.clear();
   
-    for(int  y = 0;  y < get_chip_height();  ++y){
-    for(int  x = 0;  x < get_chip_width() ;  ++x){
-      buffer.emplace_back(get_chip_pixel(x,y));
+    for(int  y = 0;  y < frm.h;  ++y){
+    for(int  x = 0;  x < frm.w;  ++x){
+      buffer.emplace_back(get_chip_pixel(frm.x+x,frm.y+y));
     }}
 
 
@@ -38,31 +39,49 @@ copy()
 void
 copy_chip()
 {
+  copy_frame = selection::get_rect().to_frame();
+
   copy_buffer.clear();
 
-    for(int  y = 0;  y < get_chip_height();  ++y){
-    for(int  x = 0;  x < get_chip_width() ;  ++x){
-      copy_buffer.emplace_back(get_chip_pixel(x,y));
+    for(int  y = 0;  y < copy_frame.h;  ++y){
+    for(int  x = 0;  x < copy_frame.w;  ++x){
+      copy_buffer.emplace_back(get_chip_pixel(copy_frame.x+x,copy_frame.y+y));
     }}
 }
 
 
 void
-paste_chip(bool  overwrite)
+paste_chip(int  x, int  y, bool  overwrite)
 {
     if(copy_buffer.size())
     {
-      auto  it = copy_buffer.cbegin();
+      auto  chip_w = get_chip_width();
+      auto  chip_h = get_chip_height();
 
-        for(int  y = 0;  y < get_chip_height();  ++y){
-        for(int  x = 0;  x < get_chip_width() ;  ++x){
-          auto  v = *it++;
-
-            if(overwrite || (v&8))
+        for(int  yy = 0;  yy < copy_frame.h;  ++yy)
+        {
+            if(y+yy >= chip_h)
             {
-              put_pixel(v,x,y);
+              break;
             }
-        }}
+
+
+            for(int  xx = 0;  xx < copy_frame.w;  ++xx)
+            {
+                if(x+xx >= chip_w)
+                {
+                  break;
+                }
+
+
+              auto  v = copy_buffer[(copy_frame.w*yy)+xx];
+
+                if(overwrite || (v&8))
+                {
+                  put_pixel(v,x+xx,y+yy);
+                }
+            }
+        }
 
 
       update_because_of_image_changed();
@@ -73,11 +92,13 @@ paste_chip(bool  overwrite)
 void
 reverse_chip_horizontally()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-    for(int  y = get_chip_height()-1;  y >=         0;  --y){
-    for(int  x =             0;  x < get_chip_width();  ++x){
-      put_pixel(*it++,x,y);
+  auto  it = copy(frm);
+
+    for(int  y = frm.h-1;  y >=    0;  --y){
+    for(int  x =       0;  x < frm.w;  ++x){
+      put_pixel(*it++,frm.x+x,frm.y+y);
     }}
 
 
@@ -88,11 +109,13 @@ reverse_chip_horizontally()
 void
 reverse_chip_vertically()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-    for(int  y =            0;  y < get_chip_height();  ++y){
-    for(int  x = get_chip_width()-1;  x >=          0;  --x){
-      put_pixel(*it++,x,y);
+  auto  it = copy(frm);
+
+    for(int  y =       0;  y < frm.h;  ++y){
+    for(int  x = frm.w-1;  x >=    0;  --x){
+      put_pixel(*it++,frm.x+x,frm.y+y);
     }}
 
 
@@ -103,13 +126,15 @@ reverse_chip_vertically()
 void
 mirror_chip_vertically()
 {
-    for(int  y = 0;  y < get_chip_height();  ++y)
-    {
-        for(int  x = 0;  x < get_chip_width()/2;  ++x)
-        {
-          auto  v = get_chip_pixel(x,y);
+  auto  frm = selection::get_rect().to_frame();
 
-          put_pixel(v,get_chip_width()-1-x,y);
+    for(int  y = 0;  y < frm.h;  ++y)
+    {
+        for(int  x = 0;  x < frm.w/2;  ++x)
+        {
+          auto  v = get_chip_pixel(frm.x+x,frm.y+y);
+
+          put_pixel(v,frm.x+frm.w-1-x,frm.y+y);
         }
     }
 
@@ -123,13 +148,15 @@ mirror_chip_vertically()
 void
 shift_chip_up()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-  it += get_chip_width();
+  auto  it = copy(frm);
 
-    for(int  y = 0;  y < get_chip_height()-1;  ++y){
-    for(int  x = 0;  x < get_chip_width()   ;  ++x){
-      put_pixel(*it++,x,y);
+  it += frm.w;
+
+    for(int  y = 0;  y < frm.h-1;  ++y){
+    for(int  x = 0;  x < frm.w  ;  ++x){
+      put_pixel(*it++,frm.x+x,frm.y+y);
     }}
 
 
@@ -140,15 +167,17 @@ shift_chip_up()
 void
 shift_chip_left()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-    for(int  y = 0;  y < get_chip_height() ;  ++y)
+  auto  it = copy(frm);
+
+    for(int  y = 0;  y < frm.h;  ++y)
     {
       ++it;
 
-        for(int  x = 0;  x < get_chip_width()-1;  ++x)
+        for(int  x = 0;  x < frm.w-1;  ++x)
         {
-          put_pixel(*it++,x,y);
+          put_pixel(*it++,frm.x+x,frm.y+y);
         }
     }
 
@@ -160,13 +189,15 @@ shift_chip_left()
 void
 shift_chip_right()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-    for(int  y = 0;  y < get_chip_height() ;  ++y)
+  auto  it = copy(frm);
+
+    for(int  y = 0;  y < frm.h;  ++y)
     {
-        for(int  x = 1;  x < get_chip_width();  ++x)
+        for(int  x = 1;  x < frm.w;  ++x)
         {
-          put_pixel(*it++,x,y);
+          put_pixel(*it++,frm.x+x,frm.y+y);
         }
 
 
@@ -181,11 +212,13 @@ shift_chip_right()
 void
 shift_chip_down()
 {
-  auto  it = copy();
+  auto  frm = selection::get_rect().to_frame();
 
-    for(int  y = 0;  y < get_chip_height()-1;  ++y){
-    for(int  x = 0;  x < get_chip_width()   ;  ++x){
-      put_pixel(*it++,x,y+1);
+  auto  it = copy(frm);
+
+    for(int  y = 0;  y < frm.h-1;  ++y){
+    for(int  x = 0;  x < frm.w  ;  ++x){
+      put_pixel(*it++,frm.x+x,frm.y+y+1);
     }}
 
 

@@ -28,21 +28,11 @@ copy(Button&  btn)
 
 
 void
-paste(Button&  btn)
+reset_selection(Button&  btn)
 {
     if(btn->test_unpressed())
     {
-      core::paste_chip(true);
-    }
-}
-
-
-void
-layer(Button&  btn)
-{
-    if(btn->test_unpressed())
-    {
-      core::paste_chip(false);
+      core::selection::reset();
     }
 }
 
@@ -122,8 +112,7 @@ oat::Widget*
 create_edit_widget()
 {
   auto  cpy_btn = new Button(new Text(u"コピー"),copy);
-  auto  pst_btn = new Button(new Text(u"貼り付け"),paste);
-  auto  lay_btn = new Button(new Text(u"重ね貼り"),layer);
+  auto  rse_btn = new Button(new Text(u"選択解除"),reset_selection);
   auto  clr_btn = new Button(new Text(u"クリア"),clear);
 
   auto  rvh_btn = new Button(new Text(u"水平反転"),reverse_horizontally);
@@ -136,7 +125,7 @@ create_edit_widget()
   auto  shr_btn = new Button(new Text(u"右へ"),shift_right);
   auto  shd_btn = new Button(new Text(u"下へ"),shift_down);
 
-  return new TableColumn({new TableRow({cpy_btn,pst_btn,lay_btn,clr_btn}),
+  return new TableColumn({new TableRow({cpy_btn,rse_btn,clr_btn}),
                           new TableRow({rvh_btn,rvv_btn,mrv_btn}),
                           new TableRow({new Text(u"シフト"),shu_btn,shl_btn,shr_btn,shd_btn}),
                         });

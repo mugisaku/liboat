@@ -12,6 +12,8 @@ Canvas: public oat::Widget
 {
   const bool  grid_extent;
 
+  void  draw_selection_frame();
+
 public:
   Canvas(bool  grid_extent_=false);
 
