@@ -70,6 +70,7 @@ OAT_OBJ +=                 \
   oat_widget.o             \
   oat_widget_render.o      \
   oat_container.o          \
+  oat_notebook.o           \
   oat_iconmodule.o         \
   oat_icon.o               \
   oat_image.o              \

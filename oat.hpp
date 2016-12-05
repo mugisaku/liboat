@@ -12,6 +12,7 @@
 #include"oat_checkform.hpp"
 #include"oat_cross.hpp"
 #include"oat_font.hpp"
+#include"oat_notebook.hpp"
 
 
 namespace oat{

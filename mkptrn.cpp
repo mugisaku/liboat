@@ -108,6 +108,42 @@ Widget*  colsel;
 Widget*  dsp0;
 Widget*  dsp1;
 
+NoteBook*  notebook;
+Widget*  p1;
+Widget*  p2;
+
+
+void
+change(Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+      static int  n;
+
+      notebook->change_top(n++&1);
+    }
+}
+
+
+void
+f1(Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+      printf("p1\n");
+    }
+}
+
+
+void
+f0(Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+      printf("p0\n");
+    }
+}
+
 
 void
 construct_widgets()
@@ -137,7 +173,17 @@ construct_widgets()
   auto  ptntbl = new TableColumn({new Text(u"テーブル0"),dsp0,
                                   new Text(u"テーブル1"),dsp1});
 
-  master.join(new TableColumn({new TableRow({canvas,ptntbl,new FramePositioner}),
+  auto  btn = new Button(new Text(u"change"),change);
+
+  p1 = new Button(new Text(u"PAGE1"),f0);
+  p2 = new Button(new Text(u"PAGE2"),f1);
+
+  notebook = new NoteBook;
+
+  notebook->join(p1,0,0);
+  notebook->join(p2,0,0);
+
+  master.join(new TableColumn({new TableRow({notebook,btn,canvas,ptntbl,new FramePositioner}),
                                new TableRow({create_tool_widget(),create_edit_widget(),
                                              new TableColumn({colsel,create_manager_widget()}),
                                             }),
