@@ -60,16 +60,15 @@ endif
 
 
 OBJ =                     \
-  mg_core.o               \
-  mg_core__edit.o         \
-  mg_core__selection.o         \
-  mg_colorselector.o      \
-  mg_motionselector.o     \
-  mg_framepositioner.o    \
+  mg_image.o           \
+  mg_image__edit.o         \
+  mg_image__widget.o         \
+  mg_area_selection.o           \
+  mg_color_selection.o    \
+  mg_tool_selection.o    \
   mg_canvas.o             \
-  mg_widget__manager.o    \
-  mg_widget__tool.o       \
-  mg_widget__edit.o       \
+  mg_message.o             \
+  mg_motionselector.o     \
   mg_patterntable.o       \
   mg_patterndisplay.o     \
   mg_animationdisplay.o   \

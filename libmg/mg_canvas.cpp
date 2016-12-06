@@ -1,6 +1,9 @@
 #include"mg_canvas.hpp"
-#include"mg_colorselector.hpp"
-#include"mg_core.hpp"
+#include"mg_image.hpp"
+#include"mg_message.hpp"
+#include"mg_area_selection.hpp"
+#include"mg_color_selection.hpp"
+#include"mg_tool_selection.hpp"
 #include<cstring>
 
 
@@ -12,11 +15,11 @@ Canvas::
 Canvas(bool  grid_extent_):
 grid_extent(grid_extent_)
 {
-  core::selection::reset();
+  area_selection::reset();
 
 
-  change_content_width( core::get_chip_width() *pixel_size);
-  change_content_height(core::get_chip_height()*pixel_size);
+  change_content_width( image::get_chip_width() *pixel_size);
+  change_content_height(image::get_chip_height()*pixel_size);
 
   style.background_color = oat::const_color::blue;
 }
@@ -33,61 +36,68 @@ process_mouse(const oat::Mouse&  mouse)
   int  x = pt.x/pixel_size;
   int  y = pt.y/pixel_size;
 
-    switch(core::get_tool_index())
+    switch(tool_selection::get_index())
     {
-  case(core::Tool::draw_point):
+  case(tool_selection::draw_point):
         if(mouse.left.test_pressing())
         {
-          core::put_pixel(core::get_color_index()|8,x,y);
+          image::put_pixel(color_selection::get_index()|8,x,y);
+
+          message::set_flag(message::image_modified_flag);
         }
 
       else
         if(mouse.right.test_pressing())
         {
-          core::put_pixel(0,x,y);
+          image::put_pixel(0,x,y);
+
+          message::set_flag(message::image_modified_flag);
         }
       break;
-  case(core::Tool::fill_area):
+  case(tool_selection::fill_area):
         if(mouse.left.test_pressing())
         {
-          core::fill_area(core::get_color_index()|8,x,y);
+          image::fill_area(color_selection::get_index()|8,x,y);
+
+          message::set_flag(message::image_modified_flag);
         }
 
       else
         if(mouse.right.test_pressing())
         {
-          core::fill_area(0,x,y);
+          image::fill_area(0,x,y);
+
+          message::set_flag(message::image_modified_flag);
         }
       break;
-  case(core::Tool::transform_selection_frame):
+  case(tool_selection::transform_area_frame):
         if(mouse.left.test_pressed())
         {
-          core::selection::grab(x,y);
+          area_selection::grab(x,y);
         }
 
       else
         if(mouse.left.test_pressing())
         {
-          core::selection::move(x,y);
+          area_selection::move(x,y);
 
-          core::set_modified_flag(core::canvas_modified_flag);
-        }
-
-      else
-        if(mouse.right.test_pressing())
-        {
+          message::set_flag(message::image_modified_flag);
         }
       break;
-  case(core::Tool::paste):
+  case(tool_selection::paste):
         if(mouse.left.test_pressing())
         {
-          core::paste_chip(x,y,true);
+          image::paste_chip(x,y,true);
+
+          message::set_flag(message::image_modified_flag);
         }
       break;
-  case(core::Tool::layer):
+  case(tool_selection::layer):
         if(mouse.left.test_pressing())
         {
-          core::paste_chip(x,y,false);
+          image::paste_chip(x,y,false);
+
+          message::set_flag(message::image_modified_flag);
         }
       break;
     }
@@ -102,7 +112,7 @@ draw_selection_frame()
 {
   auto&  pt = content.point;
 
-  auto&  rect = core::selection::get_rect();
+  auto&  rect = area_selection::get_rect();
 
   draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
                                      pt.y+(pixel_size*rect.top),
@@ -143,19 +153,19 @@ render()
   constexpr oat::Color  l1(0x7F,0x7F,0x0);
   constexpr oat::Color  l2(0xFF,0xFF,0x00);
 
-  const int  w = core::get_chip_width();
-  const int  h = core::get_chip_height();
+  const int  w = image::get_chip_width();
+  const int  h = image::get_chip_height();
 
     for(int  y = 0;  y < h;  y += 1)
     {
         for(int  x = 0;  x < w;  x += 1)
         {
-          auto  v = core::get_chip_pixel(x,y);
+          auto  v = image::get_chip_pixel(x,y);
 
             if(v&8)
             {
-              fill_rect(::palette[v&7],pt.x+(pixel_size*x),
-                                       pt.y+(pixel_size*y),pixel_size,pixel_size);
+              fill_rect(color_selection::table[v&7],pt.x+(pixel_size*x),
+                                                    pt.y+(pixel_size*y),pixel_size,pixel_size);
             }
 
 
@@ -190,8 +200,8 @@ render()
     }
 
 
-    if((core::get_tool_index() == core::Tool::transform_selection_frame) ||
-       core::selection::test_whether_transformed())
+    if((tool_selection::get_index() == tool_selection::transform_area_frame) ||
+        area_selection::test_whether_transformed())
     {
       draw_selection_frame();
     }

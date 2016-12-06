@@ -1,5 +1,5 @@
 #include"mg_patterntable.hpp"
-#include"mg_core.hpp"
+#include"mg_image.hpp"
 
 
 
@@ -8,7 +8,8 @@ void
 PatternTable::
 change(int  x, int  y)
 {
-  data[y][x].reset(core::get_frame().x,core::get_frame().y);
+  data[y][x].reset(image::get_frame().x,
+                   image::get_frame().y);
 }
 
 

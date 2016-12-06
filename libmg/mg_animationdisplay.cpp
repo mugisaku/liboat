@@ -1,6 +1,6 @@
 #include"mg_animationdisplay.hpp"
-#include"mg_colorselector.hpp"
-#include"mg_core.hpp"
+#include"mg_color_selection.hpp"
+#include"mg_image.hpp"
 
 
 
@@ -14,8 +14,8 @@ AnimationDisplay::
 AnimationDisplay():
 phase(0)
 {
-  change_content_width( core::get_chip_width() *pixel_size);
-  change_content_height(core::get_chip_height()*pixel_size);
+  change_content_width( image::get_chip_width() *pixel_size);
+  change_content_height(image::get_chip_height()*pixel_size);
 }
 
 
@@ -54,16 +54,19 @@ render()
 
   static int  bases[] = {0,1,0,2};
 
-  int  x_base = core::get_chip_width()*bases[phase];
+  const int  w = image::get_chip_width();
+  const int  h = image::get_chip_height();
 
-    for(int  y = 0;  y < core::get_chip_height();  y += 1){
-    for(int  x = 0;  x < core::get_chip_width() ;  x += 1){
-      auto  v = core::get_frame_pixel(x_base+x,y);
+  int  x_base = w*bases[phase];
+
+    for(int  y = 0;  y < h;  y += 1){
+    for(int  x = 0;  x < w;  x += 1){
+      auto  v = image::get_frame_pixel(x_base+x,y);
 
         if(v&8)
         {
-          fill_rect(::palette[v&7],pt.x+(pixel_size*x),
-                                   pt.y+(pixel_size*y),pixel_size,pixel_size);
+          fill_rect(color_selection::table[v&7],pt.x+(pixel_size*x),
+                                                pt.y+(pixel_size*y),pixel_size,pixel_size);
         }
     }}
 }

@@ -111,8 +111,11 @@ void
 Widget::
 need_to_redraw()
 {
-     set_flag(needed_to_redraw_self_flag );
-  notify_flag(needed_to_redraw_child_flag);
+    if(!test_flag(hidden_flag))
+    {
+         set_flag(needed_to_redraw_self_flag );
+      notify_flag(needed_to_redraw_child_flag);
+    }
 }
 
 

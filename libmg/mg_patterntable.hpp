@@ -2,7 +2,6 @@
 #define MG_PATTERN_TABLE_HPP_INCLUDED
 
 
-#include"mg_core.hpp"
 #include"oat.hpp"
 
 

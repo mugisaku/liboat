@@ -1,13 +1,12 @@
-#include"mg_core.hpp"
-#include"oat_widget.hpp"
+#include"mg_area_selection.hpp"
+#include"mg_image.hpp"
 #include<cstring>
 #include<cstdio>
 
 
 
 
-namespace core{
-namespace selection{
+namespace area_selection{
 
 
 namespace{
@@ -46,8 +45,8 @@ reset()
 {
   rect.left   = 0;
   rect.top    = 0;
-  rect.right  = get_chip_width() -1;
-  rect.bottom = get_chip_height()-1;
+  rect.right  = image::get_chip_width() -1;
+  rect.bottom = image::get_chip_height()-1;
 
   release();
 }
@@ -116,7 +115,7 @@ release()
 }
 
 
-}}
+}
 
 
 
