@@ -64,6 +64,7 @@ LIBOAT  = liboat.a
 
 OAT_OBJ +=                 \
   oat.o                    \
+  oat_unicode.o            \
   oat_font.o               \
   oat_color.o              \
   oat_box.o                \
@@ -77,6 +78,7 @@ OAT_OBJ +=                 \
   oat_image_directcolor.o  \
   oat_image_indexcolor.o   \
   oat_text.o               \
+  oat_textbox.o            \
   oat_dial.o               \
   oat_cross.o              \
   oat_buttonmodule.o       \
@@ -93,8 +95,7 @@ all: $(LIBOAT)          \
      aicone$(EXE_EXT)   \
      correct$(EXE_EXT)  \
      edfont$(EXE_EXT)   \
-     mkqbf$(EXE_EXT)   \
-     mkptrn$(EXE_EXT)   \
+     mkbg$(EXE_EXT)   \
      animk$(EXE_EXT)   \
      abcplay$(EXE_EXT)  \
      abc2wav$(EXE_EXT)  \
@@ -107,8 +108,7 @@ clean:
 	rm -f correct$(EXE_EXT)
 	rm -f edfont$(EXE_EXT)
 	rm -f edsnd$(EXE_EXT)
-	rm -f mkqbf$(EXE_EXT)
-	rm -f mkptrn$(EXE_EXT)
+	rm -f mkbg$(EXE_EXT)
 	rm -f animk$(EXE_EXT)
 	rm -f abcplay$(EXE_EXT)
 	rm -f abc2wav$(EXE_EXT)
@@ -116,7 +116,6 @@ clean:
 	make -C fcfont clean
 	make -C libaicone clean
 	make -C libmg clean
-	make -C libmkqbf clean
 	make -C pwg clean
 	make -C pwg_widget clean
 
@@ -139,11 +138,8 @@ aicone$(EXE_EXT): aicone.cpp LIBAICONE $(OAT_OBJ)
 correct$(EXE_EXT): correct.cpp space.cpp $(OAT_OBJ)
 	$(CXX) $^ $(CXXFLAGS) $(LDFLAGS)  -o $@
 
-mkqbf$(EXE_EXT): mkqbf.cpp LIBMKQBF $(OAT_OBJ)
-	$(CXX) mkqbf.cpp libmkqbf/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@
-
-mkptrn$(EXE_EXT): mkptrn.cpp LIBMG $(OAT_OBJ)
-	$(CXX) mkptrn.cpp libmg/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@
+mkbg$(EXE_EXT): mkbg.cpp LIBMG $(OAT_OBJ)
+	$(CXX) mkbg.cpp libmg/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@
 
 animk$(EXE_EXT): animk.cpp LIBMG $(OAT_OBJ)
 	$(CXX) animk.cpp libmg/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@

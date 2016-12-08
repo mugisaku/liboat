@@ -4,9 +4,9 @@
 #include"libmg/mg_image.hpp"
 #include"libmg/mg_color_selection.hpp"
 #include"libmg/mg_tool_selection.hpp"
-#include"libmg/mg_patterndisplay.hpp"
-#include"libmg/mg_patterntable.hpp"
+#include"libmg/mg_area_selection.hpp"
 #include"libmg/mg_canvas.hpp"
+#include"libmg/mg_board.hpp"
 
 
 #ifdef EMSCRIPTEN
@@ -15,6 +15,9 @@
 
 
 using namespace oat;
+
+
+constexpr int  chip_size = 24;
 
 
 sdlut::Screen
@@ -104,9 +107,28 @@ process_window(const SDL_WindowEvent&  evt)
 
 
 Widget*  canvas;
-Widget*  colsel;
-Widget*  dsp0;
-Widget*  dsp1;
+Widget*  panel;
+NoteBook*  notebook;
+
+
+void
+change(Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+        switch(notebook->get_top_index())
+        {
+      case(0):
+          notebook->change_top(1);
+          area_selection::reset(board::table_size,board::table_size);
+          break;
+      case(1):
+          notebook->change_top(0);
+          area_selection::reset(chip_size,chip_size);
+          break;
+        }
+    }
+}
 
 
 void
@@ -124,37 +146,31 @@ construct_widgets()
   default_style.bottom_padding = 2;
 
 
-  image::set_parameter(24,24,1);
+  image::set_parameter(chip_size,chip_size,1);
 
-  static PatternTable  t0;
-  static PatternTable  t1;
 
   canvas = new Canvas;
-    dsp0 = new PatternDisplay(t0);
-    dsp1 = new PatternDisplay(t1,&t0);
-  colsel = color_selection::create_widget();
+  panel = board::create_widget();
 
-  auto  ptntbl = new TableColumn({new Text(u"テーブル0"),dsp0,
-                                  new Text(u"テーブル1"),dsp1});
+  auto  mkptrn_left  = new TableColumn({color_selection::create_widget(),tool_selection::create_widget()});
+  auto  mkptrn_upper = new TableRow({mkptrn_left,canvas});
+  auto  mkptrn       = new TableColumn({mkptrn_upper,image::create_edit_widget()});
 
-  master.join(new TableColumn({new TableRow({canvas,ptntbl,image::create_main_widget()}),
-                               new TableRow({tool_selection::create_widget(),image::create_edit_widget(),
-                                             new TableColumn({colsel,image::create_save_widget()}),
-                                            }),
-                              }),0,0);
+
+  auto  img = image::create_main_widget();
+
+
+  notebook = new NoteBook;
+
+  notebook->join(mkptrn,0,0);
+  notebook->join(panel,0,0);
+
+
+  auto  left = new TableColumn({new Button(new Text(u"切り替え"),change),notebook});
+
+  master.join(new TableRow({left,img}),0,0);
 
   master.update();
-}
-
-
-const char*
-get_title()
-{
-  static char  buf[256];
-
-  snprintf(buf,sizeof(buf),"%s - mkptrn " __DATE__,image::get_filepath());
-
-  return buf;
 }
 
 
@@ -162,8 +178,9 @@ void
 load(char*  path)
 {
   image::read(path);
+  board::read(path);
 
-  screen.change_title(get_title());
+  message::set_flag(message::image_modified_flag);
 
   SDL_free(path);
 }
@@ -213,17 +230,8 @@ main_loop()
         if(v&message::image_modified_flag)
         {
           canvas->need_to_redraw();
-          colsel->need_to_redraw();
+          panel->need_to_redraw();
         }
-
-
-/*
-        if(v&core::patterndisplay_modified_flag)
-        {
-          dsp0->need_to_redraw();
-          dsp1->need_to_redraw();
-        }
-*/
 
 
       mouse_input = 0;
@@ -257,7 +265,7 @@ main(int  argc,  char**  argv)
 
   auto&  m = oat::master.get_module();
 
-  screen.create(get_title(),m.get_width(),m.get_height());
+  screen.create("mkbg " __DATE__,m.get_width(),m.get_height());
 
   update_screen();
 

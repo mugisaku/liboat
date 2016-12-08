@@ -62,7 +62,7 @@ int  get_chip_pixel(int  x, int  y);
 int  get_frame_pixel(int  x, int  y);
 
 
-const char*  get_filepath();
+void  change_path_text(std::u16string&&  s);
 
 void   read(const char*  path);
 void  write();

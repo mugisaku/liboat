@@ -15,9 +15,6 @@ Canvas::
 Canvas(bool  grid_extent_):
 grid_extent(grid_extent_)
 {
-  area_selection::reset();
-
-
   change_content_width( image::get_chip_width() *pixel_size);
   change_content_height(image::get_chip_height()*pixel_size);
 

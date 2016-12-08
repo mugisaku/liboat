@@ -6,12 +6,14 @@
 #include"oat_widget.hpp"
 #include"oat_master.hpp"
 #include"oat_text.hpp"
+#include"oat_textbox.hpp"
 #include"oat_button.hpp"
 #include"oat_dial.hpp"
 #include"oat_table.hpp"
 #include"oat_checkform.hpp"
 #include"oat_cross.hpp"
 #include"oat_font.hpp"
+#include"oat_unicode.hpp"
 #include"oat_notebook.hpp"
 
 

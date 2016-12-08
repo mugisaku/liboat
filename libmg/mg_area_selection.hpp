@@ -29,7 +29,7 @@ const Rect&  get_rect();
 
 bool  test_whether_transformed();
 
-void  reset();
+void  reset(int  w, int  h);
 
 void  grab(int  x, int  y);
 void  move(int  x, int  y);

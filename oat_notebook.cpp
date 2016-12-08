@@ -18,6 +18,14 @@ top_index(0)
 
 
 
+int
+NoteBook::
+get_top_index() const
+{
+  return top_index;
+}
+
+
 void
 NoteBook::
 change_top(int  i)
@@ -29,6 +37,9 @@ change_top(int  i)
         if(ii == i)
         {
           child->unset_flag(Widget::hidden_flag);
+          child->need_to_redraw();
+
+          top = child;
         }
 
       else
@@ -41,7 +52,9 @@ change_top(int  i)
     }
 
 
-  set_flag(Widget::needed_to_redraw_perfect_flag);
+  top_index = i;
+
+  set_flag(needed_to_redraw_perfect_flag);
 }
 
 

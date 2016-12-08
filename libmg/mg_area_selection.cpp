@@ -41,12 +41,12 @@ test_whether_transformed()
 
 
 void
-reset()
+reset(int  w, int  h)
 {
   rect.left   = 0;
   rect.top    = 0;
-  rect.right  = image::get_chip_width() -1;
-  rect.bottom = image::get_chip_height()-1;
+  rect.right  = w-1;
+  rect.bottom = h-1;
 
   release();
 }

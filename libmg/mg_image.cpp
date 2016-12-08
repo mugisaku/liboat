@@ -97,7 +97,7 @@ set_parameter(int  w, int  h, int  n)
   frame.w = chip_width*chip_number;
   frame.h = chip_height;
 
-  area_selection::reset();
+  area_selection::reset(w,h);
 }
 
 
@@ -169,7 +169,7 @@ get_frame_pixel(int  x, int  y)
 
 namespace{
 std::string
-png_path("__output.png");
+png_path("__new.png");
 
 
 bool
@@ -269,6 +269,11 @@ read(const char*  path)
       close_read(png,png_info,f);
 
       png_path = path;
+
+
+      auto  p = std::strrchr(path,'/');
+
+      change_path_text(oat::unicode::to_u16string(p? (p+1):path));
 	   }
 }
 

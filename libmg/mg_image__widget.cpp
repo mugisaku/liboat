@@ -133,24 +133,37 @@ save(oat::Button&  btn)
 }
 
 
+oat::TextBox*
+textbox;
+
+
 }
+
+
+void
+change_path_text(std::u16string&&  s)
+{
+  textbox->change_string(std::move(s));
+}
+
 
 
 oat::Widget*
 create_main_widget()
 {
-  return new PrivateWidget;
-}
+  auto  main = new PrivateWidget;
 
-
-oat::Widget*
-create_save_widget()
-{
   auto  btn = new oat::Button(new oat::Text(u"PNGで保存"));
+
+  textbox = new oat::TextBox(16,1);
+
+  textbox->change_string(u"__new.png");
+
+  auto  save_module = new oat::TableRow({textbox,btn});
 
   btn->set_callback(save);
 
-  return btn;
+  return new oat::TableColumn({main,save_module});
 }
 
 

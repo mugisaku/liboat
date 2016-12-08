@@ -68,9 +68,10 @@ OBJ =                     \
   mg_tool_selection.o    \
   mg_canvas.o             \
   mg_message.o             \
-  mg_motionselector.o     \
-  mg_patterntable.o       \
-  mg_patterndisplay.o     \
+  mg_board__data.o             \
+  mg_board__operate.o          \
+  mg_board__widget.o           \
+  mg_motionselector.o      \
   mg_animationdisplay.o   \
 
 

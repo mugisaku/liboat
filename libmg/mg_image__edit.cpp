@@ -267,7 +267,7 @@ reset_selection(Button&  btn)
 {
     if(btn->test_unpressed())
     {
-      area_selection::reset();
+      area_selection::reset(get_chip_width(),get_chip_height());
 
       message::set_flag(message::image_modified_flag);
     }

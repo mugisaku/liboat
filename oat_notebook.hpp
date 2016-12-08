@@ -26,6 +26,8 @@ public:
 
   void  change_top(int  i);
 
+  int  get_top_index() const;
+
   void  join(Widget*  child, int  x, int  y);
 
   void  update_sizes() override;
