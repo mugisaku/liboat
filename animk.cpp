@@ -1,12 +1,13 @@
 #include"oat.hpp"
 #include"sdlut.hpp"
-#include"libmg/mg_core.hpp"
-#include"libmg/mg_colorselector.hpp"
+#include"libmg/mg_color_selection.hpp"
+#include"libmg/mg_tool_selection.hpp"
+#include"libmg/mg_area_selection.hpp"
 #include"libmg/mg_motionselector.hpp"
 #include"libmg/mg_animationdisplay.hpp"
-#include"libmg/mg_framepositioner.hpp"
+#include"libmg/mg_image.hpp"
 #include"libmg/mg_canvas.hpp"
-#include"libmg/mg_widget.hpp"
+#include"libmg/mg_message.hpp"
 
 
 #ifdef EMSCRIPTEN
@@ -104,7 +105,6 @@ process_window(const SDL_WindowEvent&  evt)
 
 
 Canvas*          canvas;
-ColorSelector*   colsel;
 MotionSelector*  motsel;
 AnimationDisplay*   dsp;
 
@@ -124,40 +124,27 @@ construct_widgets()
   default_style.bottom_padding = 2;
 
 
-  core::set_parameter(24,40,3);
+  image::set_parameter(24,40,3);
 
   canvas = new Canvas(true);
      dsp = new AnimationDisplay;
-  colsel = new ColorSelector;
+  auto  colsel = color_selection::create_widget();
   motsel = new MotionSelector;
 
-  auto  anitbl = new TableColumn({motsel,dsp});
+  auto  anitbl = new TableColumn({colsel,motsel,dsp,tool_selection::create_widget()});
 
-  master.join(new TableColumn({new TableRow({canvas,anitbl,new FramePositioner}),
-                               new TableRow({colsel,create_tool_widget(),create_edit_widget(),create_manager_widget()}),
+  master.join(new TableColumn({new TableRow({canvas,anitbl,image::create_main_widget()}),
+                               image::create_edit_widget(),
                               }),0,0);
 
   master.update();
 }
 
 
-const char*
-get_title()
-{
-  static char  buf[256];
-
-  snprintf(buf,sizeof(buf),"%s - animk " __DATE__,core::get_filepath());
-
-  return buf;
-}
-
-
 void
 load(char*  path)
 {
-  core::read(path);
-
-  screen.change_title(get_title());
+  image::read(path);
 
   SDL_free(path);
 }
@@ -202,11 +189,7 @@ main_loop()
     {
       master.process(mouse);
 
-      auto  v = core::get_modified_flags();
-
-        if(v&core::canvas_modified_flag){canvas->need_to_redraw();}
-        if(v&core::colorselector_modified_flag){colsel->need_to_redraw();}
-        if(v&core::animationdisplay_modified_flag){dsp->need_to_redraw();}
+      auto  v = message::get_flags();
 
 
       mouse_input = 0;
@@ -242,7 +225,7 @@ main(int  argc,  char**  argv)
 
   auto&  m = oat::master.get_module();
 
-  screen.create(get_title(),m.get_width(),m.get_height());
+  screen.create("animk - " __DATE__,m.get_width(),m.get_height());
 
   update_screen();
 

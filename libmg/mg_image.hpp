@@ -52,7 +52,6 @@ void  paste_chip(int  x, int  y, bool  overwrite);
 
 oat::Widget*  create_main_widget();
 oat::Widget*  create_edit_widget();
-oat::Widget*  create_save_widget();
 
 
 
