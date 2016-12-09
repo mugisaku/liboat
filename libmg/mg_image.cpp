@@ -2,10 +2,12 @@
 #include"mg_area_selection.hpp"
 #include<cstring>
 #include<cstdio>
-#include<vector>
+
+
+#ifndef EMSCRIPTEN
 #include<libpng/png.h>
 #include<zlib.h>
-
+#endif
 
 
 
@@ -28,6 +30,11 @@ int  color_type;
 int  depth;
 
 
+uint8_t
+pixels[size][size];
+
+
+#ifndef EMSCRIPTEN
 png_color
 make_color(uint8_t  l)
 {
@@ -57,10 +64,6 @@ palette[] =
 };
 
 
-uint8_t
-pixels[size][size];
-
-
 void
 close_read(png_structp  png, png_infop  png_info, FILE*  f)
 {
@@ -78,6 +81,7 @@ close_write(png_structp  png, png_infop  png_info, FILE*  f)
 
   fclose(f);
 }
+#endif
 
 
 }
@@ -220,6 +224,7 @@ get_filepath()
 void
 read(const char*  path)
 {
+#ifndef EMSCRIPTEN
   auto  f = fopen(path,"rb");
 
     if(f && test_png(f))
@@ -275,13 +280,14 @@ read(const char*  path)
 
       change_path_text(oat::unicode::to_u16string(p? (p+1):path));
 	   }
+#endif
 }
-
 
 
 void
 write()
 {
+#ifndef EMSCRIPTEN
   auto  f = fopen(png_path.data(),"wb");
 
     if(f)
@@ -314,6 +320,7 @@ write()
 
       close_write(png,png_info,f);
     }
+#endif
 }
 
 

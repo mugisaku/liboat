@@ -39,7 +39,7 @@ ifeq ($(emcc),1)
   CXX      = CCACHE_DIR=/tmp/ccachedir ccache emcc
   CXXFLAGS = -std=gnu++11 -I. -Werror -Wno-unused-result -Os -s USE_SDL=2
   EXE_EXT  = .html
-  LDFLAGS  = 
+  LDFLAGS  = --preload-file font.bin
 else ifeq ($(ccache),1)
   CXX = CCACHE_DIR=/tmp/ccachedir ccache $(CMD_PREFIX)g++ #clang++ -Qunused-arguments
 else
@@ -95,8 +95,8 @@ all: $(LIBOAT)          \
      aicone$(EXE_EXT)   \
      correct$(EXE_EXT)  \
      edfont$(EXE_EXT)   \
-     mkbg$(EXE_EXT)   \
-     animk$(EXE_EXT)   \
+     mkbg$(EXE_EXT)     \
+     animk$(EXE_EXT)    \
      abcplay$(EXE_EXT)  \
      abc2wav$(EXE_EXT)  \
      edsnd$(EXE_EXT)    \
@@ -112,7 +112,7 @@ clean:
 	rm -f animk$(EXE_EXT)
 	rm -f abcplay$(EXE_EXT)
 	rm -f abc2wav$(EXE_EXT)
-	rm -f *.js *.html *.html.mem
+	rm -f *.js *.html *.html.mem *.data
 	make -C fcfont clean
 	make -C libaicone clean
 	make -C libmg clean

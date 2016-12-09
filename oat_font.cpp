@@ -1,6 +1,7 @@
 #include"oat_font.hpp"
 #include<algorithm>
 #include<cstdlib>
+#include<cstdio>
 
 
 

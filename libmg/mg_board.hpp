@@ -1,5 +1,5 @@
 #ifndef MG_BOARD_HPP_INCLUDED
-#define MG_BOARD_MAP_HPP_INCLUDED
+#define MG_BOARD_HPP_INCLUDED
 
 
 #include"oat.hpp"

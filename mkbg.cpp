@@ -209,9 +209,11 @@ main_loop()
           case(SDL_WINDOWEVENT):
             process_window(evt.window);
             break;
+#ifndef EMSCRIPTEN
           case(SDL_DROPFILE):
             load(evt.drop.file);
             break;
+#endif
           case(SDL_QUIT):
             screen.destroy();
             SDL_Quit();

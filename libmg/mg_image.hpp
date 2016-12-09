@@ -65,6 +65,7 @@ void  change_path_text(std::u16string&&  s);
 
 void   read(const char*  path);
 void  write();
+void  print();
 
 
 }

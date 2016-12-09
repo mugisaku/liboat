@@ -153,15 +153,13 @@ create_main_widget()
 {
   auto  main = new PrivateWidget;
 
-  auto  btn = new oat::Button(new oat::Text(u"PNGで保存"));
+  auto   btn = new oat::Button(new oat::Text(u"PNGで保存"),save);
 
   textbox = new oat::TextBox(16,1);
 
   textbox->change_string(u"__new.png");
 
   auto  save_module = new oat::TableRow({textbox,btn});
-
-  btn->set_callback(save);
 
   return new oat::TableColumn({main,save_module});
 }
