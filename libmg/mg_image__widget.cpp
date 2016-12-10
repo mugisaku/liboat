@@ -133,6 +133,16 @@ save(oat::Button&  btn)
 }
 
 
+void
+undo_(oat::Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      undo();
+    }
+}
+
+
 oat::TextBox*
 textbox;
 
@@ -153,7 +163,8 @@ create_main_widget()
 {
   auto  main = new PrivateWidget;
 
-  auto   btn = new oat::Button(new oat::Text(u"PNGで保存"),save);
+  auto udo_btn = new oat::Button(new oat::Text(u"Undo"),undo_);
+  auto     btn = new oat::Button(new oat::Text(u"PNGで保存"),save);
 
   textbox = new oat::TextBox(16,1);
 
@@ -161,7 +172,7 @@ create_main_widget()
 
   auto  save_module = new oat::TableRow({textbox,btn});
 
-  return new oat::TableColumn({main,save_module});
+  return new oat::TableColumn({main,udo_btn,save_module});
 }
 
 

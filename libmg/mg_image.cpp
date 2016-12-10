@@ -1,5 +1,6 @@
 #include"mg_image.hpp"
 #include"mg_area_selection.hpp"
+#include"mg_message.hpp"
 #include<cstring>
 #include<cstdio>
 
@@ -142,9 +143,22 @@ change_frame_point(const oat::Point&  pt)
 
 
 void
-put_pixel(int  color_index, int  x, int  y)
+put_pixel(int  color_index, int  x, int  y, bool  record)
 {
-  pixels[frame.y+y][frame.x+(chip_width*chip_index)+x] = color_index;
+  auto&  target = pixels[frame.y+y][frame.x+(chip_width*chip_index)+x];
+
+    if(target != color_index)
+    {
+        if(record)
+        {
+          push_undo_record(target,x,y);
+        }
+
+
+      target = color_index;
+
+      message::set_flag(message::image_modified_flag);
+    }
 }
 
 
@@ -279,6 +293,10 @@ read(const char*  path)
       auto  p = std::strrchr(path,'/');
 
       change_path_text(oat::unicode::to_u16string(p? (p+1):path));
+
+      clear_undo();
+
+      message::set_flag(message::image_modified_flag);
 	   }
 #endif
 }

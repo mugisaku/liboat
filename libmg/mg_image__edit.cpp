@@ -56,7 +56,7 @@ search(int  color_index_, int  target, int  x, int  y)
 
         if(get_chip_pixel(x,y) == target)
         {
-          put_pixel(color_index_,x,y);
+          put_pixel(color_index_,x,y,true);
 
             if(x                        ){search(color_index_,target,x-1,y  );}
             if(y                        ){search(color_index_,target,x  ,y-1);}
@@ -91,15 +91,19 @@ reverse_chip_horizontally(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
 
         for(int  y = frm.h-1;  y >=    0;  --y){
         for(int  x =       0;  x < frm.w;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y);
+          put_pixel(*it++,frm.x+x,frm.y+y,true);
         }}
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -111,13 +115,15 @@ reverse_chip_vertically(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
 
         for(int  y =       0;  y < frm.h;  ++y){
         for(int  x = frm.w-1;  x >=    0;  --x){
-          put_pixel(*it++,frm.x+x,frm.y+y);
+          put_pixel(*it++,frm.x+x,frm.y+y,true);
         }}
 
 
@@ -131,6 +137,8 @@ mirror_chip_vertically(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
         for(int  y = 0;  y < frm.h;  ++y)
@@ -139,10 +147,12 @@ mirror_chip_vertically(Button&  btn)
             {
               auto  v = get_chip_pixel(frm.x+x,frm.y+y);
 
-              put_pixel(v,frm.x+frm.w-1-x,frm.y+y);
+              put_pixel(v,frm.x+frm.w-1-x,frm.y+y,true);
             }
         }
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -156,6 +166,8 @@ shift_chip_up(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
@@ -164,9 +176,11 @@ shift_chip_up(Button&  btn)
 
         for(int  y = 0;  y < frm.h-1;  ++y){
         for(int  x = 0;  x < frm.w  ;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y);
+          put_pixel(*it++,frm.x+x,frm.y+y,true);
         }}
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -178,6 +192,8 @@ shift_chip_left(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
@@ -188,10 +204,12 @@ shift_chip_left(Button&  btn)
 
             for(int  x = 0;  x < frm.w-1;  ++x)
             {
-              put_pixel(*it++,frm.x+x,frm.y+y);
+              put_pixel(*it++,frm.x+x,frm.y+y,true);
             }
         }
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -203,6 +221,8 @@ shift_chip_right(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
@@ -211,13 +231,15 @@ shift_chip_right(Button&  btn)
         {
             for(int  x = 1;  x < frm.w;  ++x)
             {
-              put_pixel(*it++,frm.x+x,frm.y+y);
+              put_pixel(*it++,frm.x+x,frm.y+y,true);
             }
 
 
           ++it;
         }
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -229,15 +251,19 @@ shift_chip_down(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
       auto  frm = area_selection::get_rect().to_frame();
 
       auto  it = copy(frm);
 
         for(int  y = 0;  y < frm.h-1;  ++y){
         for(int  x = 0;  x < frm.w  ;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y+1);
+          put_pixel(*it++,frm.x+x,frm.y+y+1,true);
         }}
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -251,11 +277,15 @@ clear_chip(Button&  btn)
 {
     if(btn->test_unpressed())
     {
+      begin_to_record_string();
+
         for(int  y = 0;  y < get_chip_height();  ++y){
         for(int  x = 0;  x < get_chip_width() ;  ++x){
-          put_pixel(0,x,y);
+          put_pixel(0,x,y,true);
         }}
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -315,9 +345,13 @@ fill_area(int  color_index_, int  x, int  y)
 
     if(target != color_index_)
     {
+      begin_to_record_string();
+
       std::memset(&table,0,sizeof(table));
 
       search(color_index_,target,x,y);
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }
@@ -331,6 +365,8 @@ paste_chip(int  x, int  y, bool  overwrite)
 {
     if(copy_buffer.size())
     {
+      begin_to_record_string();
+
       auto  chip_w = get_chip_width();
       auto  chip_h = get_chip_height();
 
@@ -354,11 +390,13 @@ paste_chip(int  x, int  y, bool  overwrite)
 
                 if(overwrite || (v&8))
                 {
-                  put_pixel(v,x+xx,y+yy);
+                  put_pixel(v,x+xx,y+yy,true);
                 }
             }
         }
 
+
+      end_to_record_string();
 
       message::set_flag(message::image_modified_flag);
     }

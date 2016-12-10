@@ -60,18 +60,19 @@ endif
 
 
 OBJ =                     \
-  mg_image.o           \
-  mg_image__edit.o         \
-  mg_image__widget.o         \
-  mg_area_selection.o           \
+  mg_image.o              \
+  mg_image__edit.o        \
+  mg_image__undo.o        \
+  mg_image__widget.o      \
+  mg_area_selection.o     \
   mg_color_selection.o    \
-  mg_tool_selection.o    \
+  mg_tool_selection.o     \
   mg_canvas.o             \
-  mg_message.o             \
-  mg_board__data.o             \
-  mg_board__operate.o          \
-  mg_board__widget.o           \
-  mg_motionselector.o      \
+  mg_message.o            \
+  mg_board__data.o        \
+  mg_board__operate.o     \
+  mg_board__widget.o      \
+  mg_motionselector.o     \
   mg_animationdisplay.o   \
 
 

@@ -45,9 +45,16 @@ void  change_frame_point(const oat::Point&  pt);
 
 
 
-void  put_pixel(int  color_index, int  x, int  y);
+void  put_pixel(int  color_index, int  x, int  y, bool  record);
 void  fill_area(int  color_index_, int  x, int  y);
 void  paste_chip(int  x, int  y, bool  overwrite);
+
+
+void  undo();
+void  clear_undo();
+void  push_undo_record(int  v, int  x, int  y);
+void  begin_to_record_string();
+void    end_to_record_string();
 
 
 oat::Widget*  create_main_widget();

@@ -38,7 +38,7 @@ process_mouse(const oat::Mouse&  mouse)
   case(tool_selection::draw_point):
         if(mouse.left.test_pressing())
         {
-          image::put_pixel(color_selection::get_index()|8,x,y);
+          image::put_pixel(color_selection::get_index()|8,x,y,true);
 
           message::set_flag(message::image_modified_flag);
         }
@@ -46,7 +46,7 @@ process_mouse(const oat::Mouse&  mouse)
       else
         if(mouse.right.test_pressing())
         {
-          image::put_pixel(0,x,y);
+          image::put_pixel(0,x,y,true);
 
           message::set_flag(message::image_modified_flag);
         }
