@@ -195,15 +195,17 @@ main_loop()
 
     while(SDL_PollEvent(&evt))
     {
+      int  mouse_flag = false;
+
         switch(evt.type)
         {
           case(SDL_MOUSEBUTTONUP):
           case(SDL_MOUSEBUTTONDOWN):
-            mouse_input = 1;
+            mouse_flag = true;
             process_mouse_button(evt.button);
             break;
           case(SDL_MOUSEMOTION):
-            mouse_input = 1;
+            mouse_flag = true;
             process_mouse_motion(evt.motion);
             break;
           case(SDL_WINDOWEVENT):
@@ -220,23 +222,23 @@ main_loop()
             exit(0);
             break;
         }
-    }
 
 
-    if(mouse_input)
-    {
-      master.process(mouse);
-
-      auto  v = message::get_flags();
-
-        if(v&message::image_modified_flag)
+        if(mouse_flag)
         {
-          canvas->need_to_redraw();
-          panel->need_to_redraw();
+          master.process(mouse);
+
+          auto  v = message::get_flags();
+
+            if(v&message::image_modified_flag)
+            {
+              canvas->need_to_redraw();
+              panel->need_to_redraw();
+            }
+
+
+          ButtonModule::unset_shortlived_all();
         }
-
-
-      mouse_input = 0;
     }
 
 

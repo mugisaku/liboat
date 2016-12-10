@@ -294,10 +294,10 @@ main_loop()
 {
   static SDL_Event  evt;
 
-  int  mouse_input = 0;
-
     while(SDL_PollEvent(&evt))
     {
+      int  mouse_input = 0;
+
         switch(evt.type)
         {
           case(SDL_MOUSEBUTTONUP):
@@ -316,22 +316,33 @@ main_loop()
             break;
           default:;
         }
+
+
+        if(mouse_input)
+        {
+          master.process(mouse);
+
+          ButtonModule::unset_shortlived_all();
+
+          mouse_input = 0;
+        }
     }
 
 
-    if(mouse_input)
+  static uint32_t  next_time;
+
+  auto  now = SDL_GetTicks();
+
+    if(now >= next_time)
     {
-      master.process(mouse);
+      next_time = now+120;
 
-      mouse_input = 0;
-    }
+        if(master.update() || modified)
+        {
+          update_screen();
 
-
-    if(master.update() || modified)
-    {
-      update_screen();
-
-      modified = 0;
+          modified = 0;
+        }
     }
 }
 

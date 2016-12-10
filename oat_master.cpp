@@ -91,8 +91,6 @@ bool
 Master::
 update()
 {
-  ButtonModule::unset_shortlived_all();
-
     if(test_flag(needed_to_reform_flag))
     {
       reform();
