@@ -18,24 +18,32 @@ using namespace oat;
 
 
 Frame  copy_frame;
-std::vector<uint8_t>  copy_buffer;
 
 
+std::vector<uint8_t>      copy_buffer;
+std::vector<uint8_t>  tmp_copy_buffer;
 
-std::vector<uint8_t>::const_iterator
+int  tmpitch;
+
+
+uint8_t
+get_tmpix(int  x, int  y)
+{
+  return tmp_copy_buffer[(tmpitch*y)+x];
+}
+
+
+void
 copy(const Frame&  frm)
 {
-  static std::vector<uint8_t>  buffer;
+  tmp_copy_buffer.resize(frm.w*frm.h);
 
-  buffer.clear();
+  tmpitch = frm.w;
   
     for(int  y = 0;  y < frm.h;  ++y){
     for(int  x = 0;  x < frm.w;  ++x){
-      buffer.emplace_back(get_chip_pixel(frm.x+x,frm.y+y));
+      tmp_copy_buffer[(tmpitch*y)+x] = get_chip_pixel(frm.x+x,frm.y+y);
     }}
-
-
-  return buffer.cbegin();
 }
 
 
@@ -87,6 +95,35 @@ copy_chip(oat::Button&  btn)
 
 
 void
+revolve_chip(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      begin_to_record_string();
+
+      auto  frm = area_selection::get_rect().to_frame();
+
+      const int  w = std::min(frm.w,frm.h);
+
+      frm.w = w;
+      frm.h = w;
+
+      copy(frm);
+
+        for(int  y = 0;  y < w;  ++y){
+        for(int  x = 0;  x < w;  ++x){
+          put_pixel(get_tmpix(x,y),frm.x+w-1-y,frm.y+x,true);
+        }}
+
+
+      end_to_record_string();
+
+      message::set_flag(message::image_modified_flag);
+    }
+}
+
+
+void
 reverse_chip_horizontally(Button&  btn)
 {
     if(btn->test_unpressed())
@@ -95,11 +132,11 @@ reverse_chip_horizontally(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
+      copy(frm);
 
         for(int  y = frm.h-1;  y >=    0;  --y){
         for(int  x =       0;  x < frm.w;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y,true);
+          put_pixel(get_tmpix(x,y),frm.x+x,frm.y+y,true);
         }}
 
 
@@ -119,11 +156,11 @@ reverse_chip_vertically(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
+      copy(frm);
 
         for(int  y =       0;  y < frm.h;  ++y){
         for(int  x = frm.w-1;  x >=    0;  --x){
-          put_pixel(*it++,frm.x+x,frm.y+y,true);
+          put_pixel(get_tmpix(x,y),frm.x+x,frm.y+y,true);
         }}
 
 
@@ -170,13 +207,11 @@ shift_chip_up(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
-
-      it += frm.w;
+      copy(frm);
 
         for(int  y = 0;  y < frm.h-1;  ++y){
         for(int  x = 0;  x < frm.w  ;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y,true);
+          put_pixel(get_tmpix(x,y+1),frm.x+x,frm.y+y,true);
         }}
 
 
@@ -196,17 +231,12 @@ shift_chip_left(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
+      copy(frm);
 
-        for(int  y = 0;  y < frm.h;  ++y)
-        {
-          ++it;
-
-            for(int  x = 0;  x < frm.w-1;  ++x)
-            {
-              put_pixel(*it++,frm.x+x,frm.y+y,true);
-            }
-        }
+        for(int  y = 0;  y < frm.h  ;  ++y){
+        for(int  x = 0;  x < frm.w-1;  ++x){
+          put_pixel(get_tmpix(x+1,y),frm.x+x,frm.y+y,true);
+        }}
 
 
       end_to_record_string();
@@ -225,18 +255,12 @@ shift_chip_right(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
+      copy(frm);
 
-        for(int  y = 0;  y < frm.h;  ++y)
-        {
-            for(int  x = 1;  x < frm.w;  ++x)
-            {
-              put_pixel(*it++,frm.x+x,frm.y+y,true);
-            }
-
-
-          ++it;
-        }
+        for(int  y = 0;  y < frm.h;  ++y){
+        for(int  x = 1;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x-1,y),frm.x+x,frm.y+y,true);
+        }}
 
 
       end_to_record_string();
@@ -255,12 +279,134 @@ shift_chip_down(Button&  btn)
 
       auto  frm = area_selection::get_rect().to_frame();
 
-      auto  it = copy(frm);
+      copy(frm);
+
+        for(int  y = 1;  y < frm.h;  ++y){
+        for(int  x = 0;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x,y-1),frm.x+x,frm.y+y,true);
+        }}
+
+
+      end_to_record_string();
+
+      message::set_flag(message::image_modified_flag);
+    }
+}
+
+
+
+
+void
+rotate_chip_up(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      begin_to_record_string();
+
+      auto  frm = area_selection::get_rect().to_frame();
+
+      copy(frm);
 
         for(int  y = 0;  y < frm.h-1;  ++y){
         for(int  x = 0;  x < frm.w  ;  ++x){
-          put_pixel(*it++,frm.x+x,frm.y+y+1,true);
+          put_pixel(get_tmpix(x,y+1),frm.x+x,frm.y+y,true);
         }}
+
+
+        for(int  x = 0;  x < frm.w;  ++x)
+        {
+          put_pixel(get_tmpix(x,0),frm.x+x,frm.y+frm.h-1,true);
+        }
+
+
+      end_to_record_string();
+
+      message::set_flag(message::image_modified_flag);
+    }
+}
+
+
+void
+rotate_chip_left(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      begin_to_record_string();
+
+      auto  frm = area_selection::get_rect().to_frame();
+
+      copy(frm);
+
+        for(int  y = 0;  y < frm.h  ;  ++y){
+        for(int  x = 0;  x < frm.w-1;  ++x){
+          put_pixel(get_tmpix(x+1,y),frm.x+x,frm.y+y,true);
+        }}
+
+
+        for(int  y = 0;  y < frm.h;  ++y)
+        {
+          put_pixel(get_tmpix(0,y),frm.x+frm.w-1,frm.y+y,true);
+        }
+
+
+      end_to_record_string();
+
+      message::set_flag(message::image_modified_flag);
+    }
+}
+
+
+void
+rotate_chip_right(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      begin_to_record_string();
+
+      auto  frm = area_selection::get_rect().to_frame();
+
+      copy(frm);
+
+        for(int  y = 0;  y < frm.h;  ++y){
+        for(int  x = 1;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x-1,y),frm.x+x,frm.y+y,true);
+        }}
+
+
+        for(int  y = 0;  y < frm.h;  ++y)
+        {
+          put_pixel(get_tmpix(frm.w-1,y),frm.x,frm.y+y,true);
+        }
+
+
+      end_to_record_string();
+
+      message::set_flag(message::image_modified_flag);
+    }
+}
+
+
+void
+rotate_chip_down(Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      begin_to_record_string();
+
+      auto  frm = area_selection::get_rect().to_frame();
+
+      copy(frm);
+
+        for(int  y = 1;  y < frm.h;  ++y){
+        for(int  x = 0;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x,y-1),frm.x+x,frm.y+y,true);
+        }}
+
+
+        for(int  x = 0;  x < frm.w;  ++x)
+        {
+          put_pixel(get_tmpix(x,frm.h-1),frm.x+x,frm.y,true);
+        }
 
 
       end_to_record_string();
@@ -319,6 +465,7 @@ create_edit_widget()
   auto  rse_btn = new Button(new Text(u"選択解除"),reset_selection);
   auto  clr_btn = new Button(new Text(u"クリア"),clear_chip);
 
+  auto  rvl_btn = new Button(new Text(u"右回転"),revolve_chip);
   auto  rvh_btn = new Button(new Text(u"水平反転"),reverse_chip_horizontally);
   auto  rvv_btn = new Button(new Text(u"垂直反転"),reverse_chip_vertically);
   auto  mrv_btn = new Button(new Text(u"垂直鏡像"),mirror_chip_vertically);
@@ -329,9 +476,15 @@ create_edit_widget()
   auto  shr_btn = new Button(new Text(u"右へ"),shift_chip_right);
   auto  shd_btn = new Button(new Text(u"下へ"),shift_chip_down);
 
+  auto  rou_btn = new Button(new Text(u"上へ"),rotate_chip_up);
+  auto  rol_btn = new Button(new Text(u"左へ"),rotate_chip_left);
+  auto  ror_btn = new Button(new Text(u"右へ"),rotate_chip_right);
+  auto  rod_btn = new Button(new Text(u"下へ"),rotate_chip_down);
+
   return new TableColumn({new TableRow({cpy_btn,rse_btn,clr_btn}),
-                          new TableRow({rvh_btn,rvv_btn,mrv_btn}),
+                          new TableRow({rvl_btn,rvh_btn,rvv_btn,mrv_btn}),
                           new TableRow({new Text(u"シフト"),shu_btn,shl_btn,shr_btn,shd_btn}),
+                          new TableRow({new Text(u"ローテ"),rou_btn,rol_btn,ror_btn,rod_btn}),
                         });
 }
 
