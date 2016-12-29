@@ -134,9 +134,9 @@ reverse_chip_horizontally(Button&  btn)
 
       copy(frm);
 
-        for(int  y = frm.h-1;  y >=    0;  --y){
-        for(int  x =       0;  x < frm.w;  ++x){
-          put_pixel(get_tmpix(x,y),frm.x+x,frm.y+y,true);
+        for(int  y = 0;  y < frm.h;  ++y){
+        for(int  x = 0;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x,y),frm.x+x,frm.y+frm.h-1-y,true);
         }}
 
 
@@ -158,9 +158,9 @@ reverse_chip_vertically(Button&  btn)
 
       copy(frm);
 
-        for(int  y =       0;  y < frm.h;  ++y){
-        for(int  x = frm.w-1;  x >=    0;  --x){
-          put_pixel(get_tmpix(x,y),frm.x+x,frm.y+y,true);
+        for(int  y = 0;  y < frm.h;  ++y){
+        for(int  x = 0;  x < frm.w;  ++x){
+          put_pixel(get_tmpix(x,y),frm.x+frm.w-1-x,frm.y+y,true);
         }}
 
 
