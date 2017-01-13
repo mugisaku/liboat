@@ -38,7 +38,27 @@ change_p(oat::RadioForm::Member&  m)
 void
 change_i(oat::Dial&  dial, int  old_value)
 {
+  static const char16_t*  const table[] =
+  {
+    u"NULL",
+    u"平地",
+    u"荒地",
+    u"沼地",
+    u"砂地",
+    u"雪原",
+    u"氷原",
+    u"草原",
+    u"川",
+    u"森",
+    u"山",
+    u"海",
+  };
+
+  auto&  txt = *static_cast<Text*>(dial.get_userdata());
+
   index = dial.get_value();
+
+  txt.change_string((index < 12) ?table[index]:u"----");
 }
 
 
@@ -446,9 +466,15 @@ create_widget()
                              new Text(u"属性を設定"),
                              new Text(u"エリアを選択")},change_p);
 
+
+  auto  id_txt = new Text(u"NULL");
+
   auto  dia = new Dial(new Text(u"インデックス"),99,1);
 
+  
+
   dia->set_callback(change_i);
+  dia->set_userdata(id_txt);
 
   auto  save_module = new oat::TableRow({textbox,btn});
 
@@ -456,7 +482,7 @@ create_widget()
 
   auto  top_row = new TableRow({main,rcol});
 
-  return new TableColumn({top_row,dia,opw,save_module});
+  return new TableColumn({top_row,new TableRow({dia,id_txt}),opw,save_module});
 }
 
 

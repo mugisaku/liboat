@@ -39,7 +39,13 @@ change_string(const std::string&  s)
 
   string = s;
 
-  change_content_width(font::width*s.size());
+  int  w = font::width*s.size();
+
+    if(content.width < w)
+    {
+      change_content_width(w);
+    }
+
 
   need_to_redraw();
 }
@@ -53,7 +59,13 @@ change_string(const std::u16string&  s)
 
   u16string = s;
 
-  change_content_width(font::width*s.size());
+  int  w = font::width*s.size();
+
+    if(content.width < w)
+    {
+      change_content_width(w);
+    }
+
 
   need_to_redraw();
 }
