@@ -12,14 +12,14 @@ draw_preview_line(void*  that, int  color, int  x, int  y)
 {
   auto&  c = *static_cast<Clip*>(that);
 
-  c.put(color,x,y);
+  c.Card::put(color,x,y);
 }
 
 
 void
 draw_line(void*  that, int  color, int  x, int  y)
 {
-  auto&  c = *static_cast<Card*>(that);
+  auto&  c = *static_cast<SuperCard*>(that);
 
   c.put(color,x,y);
 }
@@ -36,20 +36,24 @@ process_draw_line(bool  button, int  color, int  x, int  y)
 {
     if(button)
     {
-        if(point0.x < 0)
+        if(!selected_flag)
         {
+          selected_flag = true;
+
           point0.reset(x,y);
+
+          temporary_clip.change_size(SuperCard::width,SuperCard::height);
         }
 
       else
         {
           point1.reset(x,y);
 
-          target->get(preview_clip,0,0,0,0);
+          composing_flag = true;
 
-          preview_flag = true;
+          temporary_clip.clear();
 
-          drawing::draw_line(&preview_clip,draw_preview_line,color,point0.x,point0.y,point1.x,point1.y);
+          drawing::draw_line(&temporary_clip,draw_preview_line,color,point0.x,point0.y,point1.x,point1.y);
         }
     }
 
@@ -61,9 +65,8 @@ process_draw_line(bool  button, int  color, int  x, int  y)
 
       target->prepare_new_log(true);
 
-      point0.x = -1;
-
-      preview_flag = false;
+       selected_flag = false;
+      composing_flag = false;
     }
 }
 

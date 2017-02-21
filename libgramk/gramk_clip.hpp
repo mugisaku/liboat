@@ -8,10 +8,8 @@
 
 
 class
-Clip
+Clip: public Card
 {
-  uint8_t  pixels[Card::height][Card::width];
-
   int   width;
   int  height;
 
@@ -21,10 +19,7 @@ public:
   int  get_width()  const;
   int  get_height() const;
 
-  uint8_t  get(                int  x, int  y) const;
-  void     put(uint8_t  pixel, int  x, int  y)      ;
-
-  void  clear();
+  void  put(const Clip&  src, int  x, int  y);
 
 };
 

@@ -8,10 +8,11 @@ Painter::
 Painter(Callback  cb):
 target(nullptr),
 callback(cb),
-current_color(8|15)
+current_color(8|15),
+drawing_rect(0,0,SuperCard::width,SuperCard::height)
 {
-  change_content_width( Card::width *pixel_size);
-  change_content_height(Card::height*pixel_size);
+  change_content_width( SuperCard::width *pixel_size);
+  change_content_height(SuperCard::height*pixel_size);
 
   style.background_color = oat::const_color::blue;
 
@@ -23,7 +24,7 @@ current_color(8|15)
 
 void
 Painter::
-change_target(Card&  card)
+change_target(SuperCard&  card)
 {
   target = &card;
 
@@ -40,20 +41,30 @@ change_mode(PaintingMode  mode_)
 {
   mode = mode_;
 
-  point0.x = -1;
-
-  preview_flag = false;
-
-  preview_clip.clear();
+   selected_flag = false;
+  composing_flag = false;
 
   need_to_redraw();
 }
 
 
-Card*  Painter::get_target() const{return target;}
+SuperCard*  Painter::get_target() const{return target;}
 
 
 uint8_t  Painter::get_current_color() const{return current_color;}
+
+
+const Rect&  Painter::get_drawing_rect() const{return drawing_rect;}
+
+
+void
+Painter::
+copy()
+{
+  Rect  rect = selected_flag? selected_rect:Rect(0,0,SuperCard::width,SuperCard::height);
+
+  target->get(copy_clip,rect);
+}
 
 
 void
@@ -130,12 +141,36 @@ process_mouse(const oat::Mouse&  mouse)
   case(PaintingMode::paste):
         if(mouse.left.test_pressing())
         {
+          composing_flag = true;
+
+          temporary_clip.clear();
+
+          temporary_clip.put(copy_clip,x,y);
+        }
+
+      else
+        if(mouse.left.test_unpressed())
+        {
+          composing_flag = false;
+
           target->put(copy_clip,x,y,true);
         }
       break;
   case(PaintingMode::layer):
         if(mouse.left.test_pressing())
         {
+          composing_flag = true;
+
+          temporary_clip.clear();
+
+          temporary_clip.put(copy_clip,x,y);
+        }
+
+      else
+        if(mouse.left.test_unpressed())
+        {
+          composing_flag = false;
+
           target->put(copy_clip,x,y,false);
         }
       break;
@@ -203,12 +238,15 @@ render()
 
   constexpr oat::Color  l1(0x7F,0x7F,0x0);
   constexpr oat::Color  l2(0xFF,0xFF,0x00);
-  const int  w = Card::width;
-  const int  h = Card::height;
 
-    if(!preview_flag)
+  constexpr int  w = SuperCard::width ;
+  constexpr int  h = SuperCard::height;
+
+  target->draw(*this,pt.x,pt.y,pixel_size);
+
+    if(composing_flag)
     {
-      target->get(preview_clip,0,0,0,0);
+      temporary_clip.draw(*this,pt.x,pt.y,pixel_size);
     }
 
 
@@ -216,15 +254,6 @@ render()
     {
         for(int  x = 0;  x < w;  ++x)
         {
-          auto  v = preview_clip.get(x,y);
-
-            if(v&8)
-            {
-              fill_rect(palette[v&7],pt.x+(pixel_size*x),
-                                     pt.y+(pixel_size*y),pixel_size,pixel_size);
-            }
-
-
           draw_vline(l1,pt.x+pixel_size*x,
                         pt.y,
                         pixel_size*h);

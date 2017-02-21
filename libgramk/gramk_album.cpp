@@ -13,14 +13,14 @@ png_path("__new.png")
 
     for(auto&  ptr: table)
     {
-      ptr = new Card;
+      ptr = new SuperCard;
     }
 
 
   callback(table[0]);
 
-  change_content_width( Card::width *table_width);
-  change_content_height(Card::height*table_height);
+  change_content_width( Card::fixed_width *table_width);
+  change_content_height(Card::fixed_height*table_height);
 
   style.background_color = oat::const_color::blue;
 }
@@ -36,8 +36,8 @@ process_mouse(const oat::Mouse&  mouse)
 
     if(mouse.left.test_pressed())
     {
-      cursor.x = pt.x/Card::width;
-      cursor.y = pt.y/Card::height;
+      cursor.x = pt.x/Card::fixed_width;
+      cursor.y = pt.y/Card::fixed_height;
 
       callback(table[(table_width*cursor.y)+cursor.x]);
 
@@ -60,17 +60,17 @@ render()
     for(int  x = 0;  x <  table_width;  ++x){
       auto&  c = *table[(table_width*y)+x];
 
-      c.draw(*this,pt.x+(Card::width*x),
-                   pt.y+(Card::height*y));
+      c.draw(*this,pt.x+(Card::fixed_width*x),
+                   pt.y+(Card::fixed_height*y));
     }}
 
 
-  draw_rect(oat::const_color::red,pt.x+(Card::width *cursor.x),
-                                  pt.y+(Card::height*cursor.y),Card::width,Card::height);
+  draw_rect(oat::const_color::red,pt.x+(Card::fixed_width *cursor.x),
+                                  pt.y+(Card::fixed_height*cursor.y),Card::fixed_width,Card::fixed_height);
 }
 
 
-const Card*
+const SuperCard*
 Album::
 get_current() const
 {

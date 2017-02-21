@@ -110,14 +110,14 @@ anibox;
 
 
 void
-painter_callback(Card*  card)
+painter_callback(SuperCard*  card)
 {
   album->need_to_redraw();
 }
 
 
 void
-album_callback(Card*  card)
+album_callback(SuperCard*  card)
 {
     if(card)
     {

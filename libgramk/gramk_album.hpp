@@ -4,13 +4,11 @@
 
 #include"oat.hpp"
 #include"gramk_card.hpp"
-#include"gramk_clip.hpp"
+#include"gramk_supercard.hpp"
+#include"gramk_painter.hpp"
 #include<string>
 
 
-
-
-struct Painter;
 
 
 class
@@ -24,7 +22,7 @@ Album: public oat::Widget
 
   oat::Point  cursor;
 
-  std::vector<Card*>  table;
+  std::vector<SuperCard*>  table;
 
   std::string  png_path;
 
@@ -37,7 +35,7 @@ public:
   void   read(const char*  path);
   void  write(                 );
 
-  const Card*  get_current() const;
+  const SuperCard*  get_current() const;
 
   const char*  get_filepath() const;
 

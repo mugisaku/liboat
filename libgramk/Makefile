@@ -61,10 +61,11 @@ endif
 
 OBJ =                                     \
   gramk_drawing.o                         \
-  gramk_clip.o                            \
   gramk_card.o                            \
-  gramk_card__shift.o                     \
-  gramk_card__fill_area.o                 \
+  gramk_clip.o                            \
+  gramk_supercard.o                       \
+  gramk_supercard__shift.o                \
+  gramk_supercard__fill_area.o            \
   gramk_painter.o                         \
   gramk_painter__draw_line.o              \
   gramk_painter__create_oper_widget.o     \

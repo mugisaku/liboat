@@ -15,8 +15,8 @@ current(0),
 last_time(0),
 interval_time(200)
 {
-  change_content_width( Card::width *pixel_size);
-  change_content_height(Card::height*pixel_size);
+  change_content_width( Card::fixed_width *pixel_size);
+  change_content_height(Card::fixed_height*pixel_size);
 }
 
 

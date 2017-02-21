@@ -3,7 +3,7 @@
 
 
 #include"oat.hpp"
-#include"gramk_card.hpp"
+#include"gramk_supercard.hpp"
 #include"gramk_clip.hpp"
 
 
@@ -26,17 +26,6 @@ palette[number_of_colors] =
 };
 
 
-struct
-Rect
-{
-  int  x;
-  int  y;
-  int  w;
-  int  h;
-
-};
-
-
 enum class
 PaintingMode
 {
@@ -52,29 +41,33 @@ PaintingMode
 };
 
 
+using Callback = void  (*)(SuperCard*  card);
+
+
 class
 Painter: public oat::Widget
 {
   static constexpr int  pixel_size = 10;
 
-  Card*  target;
+  SuperCard*  target;
 
   Callback  callback;
 
-  Clip      copy_clip;
-  Clip   preview_clip;
-  Clip  composed_clip;
+  Clip       copy_clip;
+  Clip  temporary_clip;
 
   PaintingMode  mode;
 
   uint8_t  current_color;
 
+  bool  composing_flag;
+  bool   selected_flag;
+
   oat::Point  point0;
   oat::Point  point1;
 
+  Rect   drawing_rect;
   Rect  selected_rect;
-
-  bool  preview_flag;
 
   void  draw_selection_frame();
 
@@ -83,14 +76,18 @@ Painter: public oat::Widget
 public:
   Painter(Callback  cb);
 
-  void  change_target(Card&  card);
+  void  change_target(SuperCard&  card);
 
   void  change_current_color(uint8_t  color);
   void  change_mode(PaintingMode  mode_);
 
-  Card*  get_target() const;
+  SuperCard*  get_target() const;
 
   uint8_t  get_current_color() const;
+
+  const Rect&  get_drawing_rect() const;
+
+  void  copy();
 
   void  process_mouse(const oat::Mouse&  mouse) override;
   void  render() override;

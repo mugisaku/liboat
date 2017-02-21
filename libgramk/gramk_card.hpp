@@ -2,76 +2,49 @@
 #define GRAMK_CARD_HPP_INCLUDED
 
 
+#include<cstdint>
 #include"oat.hpp"
-#include"gramk_packet.hpp"
-#include<forward_list>
 
 
-
-
-struct Clip;
-struct Card;
-
-
-using Callback = void  (*)(Card*  card);
 
 
 class
 Card
 {
 public:
-  static constexpr int   width = 24;
-  static constexpr int  height = 48;
+  static constexpr int  fixed_width  = 24;
+  static constexpr int  fixed_height = 48;
 
+protected:
 
-private:
-  uint8_t  pixels[height][width];
-
-  std::forward_list<Packet>  log_list;
-
-  std::vector<Dot>  operation_log;
-
-  void  subroutine_for_fill_area(int  color, int  x, int  y, int  target);
+  uint8_t  color_table[fixed_height][fixed_width];
 
 public:
   Card();
-  Card(const Card&  rhs);
 
-  Card&  operator=(const Card&  rhs);
-
-  void  put(                int  color, int  x, int  y);
-  void  put_without_logging(int  color, int  x, int  y);
-  void  put(const Clip&  clip, int  x, int  y, bool  overwrite);
-
-  void  revolve(             int  x, int  y, int  w, int  h);
-  void  reverse_horizontally(int  x, int  y, int  w, int  h);
-  void  reverse_vertically(  int  x, int  y, int  w, int  h);
-  void  mirror_vertically(   int  x, int  y, int  w, int  h);
-
-  void  shift_up(    int  x, int  y, int  w, int  h);
-  void  shift_left(  int  x, int  y, int  w, int  h);
-  void  shift_right( int  x, int  y, int  w, int  h);
-  void  shift_down(  int  x, int  y, int  w, int  h);
-  void  rotate_up(   int  x, int  y, int  w, int  h);
-  void  rotate_left( int  x, int  y, int  w, int  h);
-  void  rotate_right(int  x, int  y, int  w, int  h);
-  void  rotate_down( int  x, int  y, int  w, int  h);
-
-  void  draw_rect(int  color, int  x, int  y, int  w, int  h);
-  void  fill_rect(int  color, int  x, int  y, int  w, int  h);
-  void  fill_area(int  color, int  x, int  y);
-
-  uint8_t  get(int  x, int  y) const;
-
-  void  get(Clip&  clip, int  x, int  y, int  w, int  h) const;
-
-  void  undo();
-
-  void  prepare_new_log(bool  solid_flag=false);
+  uint8_t  get(                int  x, int  y) const;
+  void     put(uint8_t  color, int  x, int  y)      ;
 
   void  clear();
 
-  void  draw(oat::Widget&  dst, int  x, int  y) const;
+  void  draw(oat::Widget&  dst, int  x, int  y, int  pixel_size=1) const;
+
+};
+
+
+struct
+Rect
+{
+  int  x;
+  int  y;
+  int  w;
+  int  h;
+
+  constexpr Rect(int  x_=0, int  y_=0, int  w_=0, int  h_=0):
+  x(x_),
+  y(y_),
+  w(w_),
+  h(h_){}
 
 };
 
