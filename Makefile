@@ -110,12 +110,14 @@ clean:
 	rm -f edsnd$(EXE_EXT)
 	rm -f mkbg$(EXE_EXT)
 	rm -f animk$(EXE_EXT)
+	rm -f gramk$(EXE_EXT)
 	rm -f abcplay$(EXE_EXT)
 	rm -f abc2wav$(EXE_EXT)
 	rm -f *.js *.html *.html.mem *.data
 	make -C fcfont clean
 	make -C libaicone clean
 	make -C libmg clean
+	make -C libgramk clean
 	make -C pwg clean
 	make -C pwg_widget clean
 
@@ -144,6 +146,9 @@ mkbg$(EXE_EXT): mkbg.cpp LIBMG $(OAT_OBJ)
 animk$(EXE_EXT): animk.cpp LIBMG $(OAT_OBJ)
 	$(CXX) animk.cpp libmg/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@
 
+gramk$(EXE_EXT): gramk.cpp LIBGRAMK $(OAT_OBJ)
+	$(CXX) gramk.cpp libgramk/*.o $(OAT_OBJ) $(CXXFLAGS) $(LDFLAGS) -lz -lpng  -o $@
+
 edfont$(EXE_EXT): edfont.cpp FCFONT $(OAT_OBJ)
 	$(CXX) edfont.cpp $(OAT_OBJ) fcfont/*.o $(CXXFLAGS) $(LDFLAGS)  -o $@
 
@@ -167,12 +172,12 @@ PWG:
 	make -C pwg
 
 
+LIBGRAMK:
+	make -C libgramk
+
+
 LIBMG:
 	make -C libmg
-
-
-LIBMKQBF:
-	make -C libmkqbf
 
 
 PWG_WIDGET:
@@ -183,7 +188,7 @@ LIBAICONE:
 	make -C libaicone
 
 
-.PHONY: LIBMG LIBMKQBF LIBAICONE FCFONT PWG PWG_WIDGET
+.PHONY: LIBMG LIBGRAMK LIBAICONE FCFONT PWG PWG_WIDGET
 
 
 

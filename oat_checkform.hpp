@@ -24,7 +24,7 @@ public:
   };
 
 
-  using Callback = void  (*)(Member&  member);
+  using Callback = void  (*)(CheckForm&  form, Member&  member);
 
 protected:
   struct PerfectMember: public Member{

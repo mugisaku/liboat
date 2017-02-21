@@ -102,7 +102,7 @@ process_mouse(const Mouse&  mouse)
                     if(icon->get_current() == 0){icon->change_current(1);}
                   else                          {icon->change_current(0);}
 
-                  callback(*m);
+                  callback(*this,*m);
 
                   return;
                 }
@@ -112,14 +112,14 @@ process_mouse(const Mouse&  mouse)
                 {
                   icon->change_current(1);
 
-                  callback(*m);
+                  callback(*this,*m);
 
 
                   auto&  last = *members[last_index];
 
                   last.icon->change_current(0);
 
-                  callback(last);
+                  callback(*this,last);
                 }
 
 
