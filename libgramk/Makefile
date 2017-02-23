@@ -67,7 +67,7 @@ OBJ =                                     \
   gramk_supercard__shift.o                \
   gramk_supercard__fill_area.o            \
   gramk_painter.o                         \
-  gramk_painter__draw_line.o              \
+  gramk_painter__move_corner.o            \
   gramk_painter__create_oper_widget.o     \
   gramk_painter__create_mode_widget.o     \
   gramk_painter__create_palette_widget.o  \

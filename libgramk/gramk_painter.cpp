@@ -1,6 +1,8 @@
 #include"gramk_painter.hpp"
 #include"gramk_drawing.hpp"
 #include<cstring>
+#include<algorithm>
+
 
 
 
@@ -9,7 +11,9 @@ Painter(Callback  cb):
 target(nullptr),
 callback(cb),
 current_color(8|15),
-drawing_rect(0,0,SuperCard::width,SuperCard::height)
+operating_rect(0,0,SuperCard::width,SuperCard::height),
+selecting_state(0),
+rect_corner(Corner::none)
 {
   change_content_width( SuperCard::width *pixel_size);
   change_content_height(SuperCard::height*pixel_size);
@@ -41,8 +45,19 @@ change_mode(PaintingMode  mode_)
 {
   mode = mode_;
 
-   selected_flag = false;
-  composing_flag = false;
+       if(selecting_state == 1){selecting_state = 2;}
+  else if(selecting_state == 2){selecting_state = 1;}
+
+
+  composing_flag  = false;
+
+  point0.x = -1;
+  point1.x = -1;
+
+  single_pointing_flag = ((mode == PaintingMode::draw_point) ||
+                          (mode == PaintingMode::fill_area)  ||
+                          (mode == PaintingMode::paste)      ||
+                          (mode == PaintingMode::layer));
 
   need_to_redraw();
 }
@@ -54,16 +69,125 @@ SuperCard*  Painter::get_target() const{return target;}
 uint8_t  Painter::get_current_color() const{return current_color;}
 
 
-const Rect&  Painter::get_drawing_rect() const{return drawing_rect;}
+const Rect&  Painter::get_operating_rect() const{return operating_rect;}
 
 
 void
 Painter::
 copy()
 {
-  Rect  rect = selected_flag? selected_rect:Rect(0,0,SuperCard::width,SuperCard::height);
+  Rect  rect = (point0.x >= 0)? operating_rect:Rect(0,0,SuperCard::width,SuperCard::height);
 
   target->get(copy_clip,rect);
+}
+
+
+
+
+namespace{
+void
+clip_cb(void*  that, int  color, int  x, int  y)
+{
+  auto&  c = *static_cast<Clip*>(that);
+
+  c.Card::put(color,x,y);
+}
+
+
+void
+scard_cb(void*  that, int  color, int  x, int  y)
+{
+  auto&  c = *static_cast<SuperCard*>(that);
+
+  c.put(color,x,y);
+}
+}
+
+
+
+
+void
+Painter::
+make_pointing(int  x, int  y)
+{
+    if(point0.x < 0)
+    {
+      point0.reset(x,y);
+      point1.reset(x,y);
+
+      temporary_clip.change_size(SuperCard::width,SuperCard::height);
+
+      composing_flag = true;
+    }
+
+  else
+    {
+      point1.reset(x,y);
+
+      temporary_clip.clear();
+
+        switch(mode)
+        {
+      case(PaintingMode::draw_line):
+          drawing::draw_line(&temporary_clip,clip_cb,current_color,point0,point1);
+          break;
+      case(PaintingMode::draw_rect):
+          form_rect();
+
+          drawing::draw_rect(&temporary_clip,clip_cb,current_color,operating_rect);
+          break;
+      case(PaintingMode::fill_rect):
+          form_rect();
+
+          drawing::fill_rect(&temporary_clip,clip_cb,current_color,operating_rect);
+          break;
+      case(PaintingMode::transform_area_frame):
+          form_rect();
+
+          selecting_state = 1;
+          break;
+        }
+    }
+}
+
+
+void
+Painter::
+form_rect()
+{
+  const int  x_min = std::min(point0.x,point1.x);
+  const int  x_max = std::max(point0.x,point1.x);
+  const int  y_min = std::min(point0.y,point1.y);
+  const int  y_max = std::max(point0.y,point1.y);
+
+  operating_rect.x =       x_min;
+  operating_rect.y =       y_min;
+  operating_rect.w = x_max-x_min+1;
+  operating_rect.h = y_max-y_min+1;
+}
+
+
+
+
+void
+Painter::
+paste(int  x, int  y, HowToPaste  how)
+{
+    if(how == HowToPaste::rehearsal)
+    {
+      composing_flag = true;
+
+      temporary_clip.clear();
+
+      temporary_clip.put(copy_clip,x,y);
+    }
+
+  else
+    {
+      composing_flag = false;
+
+      target->put(copy_clip,x,y,(how == HowToPaste::production_with_overwrite));
+    }
 }
 
 
@@ -82,98 +206,91 @@ process_mouse(const oat::Mouse&  mouse)
   int  x = pt.x/pixel_size;
   int  y = pt.y/pixel_size;
 
-    switch(mode)
+    if(single_pointing_flag)
     {
-  case(PaintingMode::draw_point):
-        if(mouse.left.test_pressing())
+        switch(mode)
         {
-          target->put(current_color|8,x,y);
+      case(PaintingMode::draw_point):
+               if(mouse.left.test_pressing() ){target->put(current_color|8,x,y);}
+          else if(mouse.right.test_pressing()){target->put(              0,x,y);}
+          break;
+      case(PaintingMode::fill_area):
+               if(mouse.left.test_pressing() ){target->fill_area(current_color|8,x,y);}
+          else if(mouse.right.test_pressing()){target->fill_area(              0,x,y);}
+          break;
+      case(PaintingMode::paste):
+               if(mouse.left.test_pressing() ){paste(x,y,HowToPaste::rehearsal );}
+          else if(mouse.left.test_unpressed()){paste(x,y,HowToPaste::production_with_overwrite);}
+          break;
+      case(PaintingMode::layer):
+               if(mouse.left.test_pressing() ){paste(x,y,HowToPaste::rehearsal );}
+          else if(mouse.left.test_unpressed()){paste(x,y,HowToPaste::production);}
+          break;
+        }
+    }
+
+  else
+    if(mouse.right.test_pressing())
+    {
+CANCEL:
+      composing_flag = false;
+
+      point0.x = -1;
+      point1.x = -1;
+    }
+
+  else
+    if(mouse.left.test_pressing())
+    {
+        if(selecting_state == 2)
+        {
+          move_corner(x,y);
         }
 
       else
-        if(mouse.right.test_pressing())
         {
-          target->put(0,x,y);
+          make_pointing(x,y);
         }
-      break;
-  case(PaintingMode::draw_line):
-           if(mouse.left.test_pressing()){process_draw_line(true,current_color|8,x,y);}
-      else if(mouse.right.test_pressing()){process_draw_line(true,0,x,y);}
-      else if(mouse.left.test_unpressed()){process_draw_line(false,current_color|8,x,y);}
-      else if(mouse.right.test_unpressed()){process_draw_line(false,0,x,y);}
-      break;
-  case(PaintingMode::draw_rect):
-           if(mouse.left.test_pressing()){process_draw_line(true,current_color|8,x,y);}
-      else if(mouse.right.test_pressing()){process_draw_line(true,0,x,y);}
-      else if(mouse.left.test_unpressed()){process_draw_line(false,current_color|8,x,y);}
-      else if(mouse.right.test_unpressed()){process_draw_line(false,0,x,y);}
-      break;
-  case(PaintingMode::fill_rect):
-           if(mouse.left.test_pressing()){process_draw_line(true,current_color|8,x,y);}
-      else if(mouse.right.test_pressing()){process_draw_line(true,0,x,y);}
-      else if(mouse.left.test_unpressed()){process_draw_line(false,current_color|8,x,y);}
-      else if(mouse.right.test_unpressed()){process_draw_line(false,0,x,y);}
-      break;
-  case(PaintingMode::fill_area):
-        if(mouse.left.test_pressing())
+    }
+
+  else
+    if(mouse.left.test_unpressed())
+    {
+        switch(mode)
         {
-          target->fill_area(current_color|8,x,y);
+      case(PaintingMode::draw_line):
+          target->prepare_new_log();
+
+          drawing::draw_line(target,scard_cb,current_color,point0,point1);
+
+          target->prepare_new_log(true);
+
+          goto CANCEL;
+          break;
+      case(PaintingMode::draw_rect):
+          target->prepare_new_log();
+
+          drawing::draw_rect(target,scard_cb,current_color,operating_rect);
+
+          target->prepare_new_log(true);
+
+          goto CANCEL;
+          break;
+      case(PaintingMode::fill_rect):
+          target->prepare_new_log();
+
+          drawing::fill_rect(target,scard_cb,current_color,operating_rect);
+
+          target->prepare_new_log(true);
+
+          goto CANCEL;
+          break;
+      case(PaintingMode::transform_area_frame):
+          selecting_state = 2;
+
+          rect_corner = Corner::none;
+          break;
         }
-
-      else
-        if(mouse.right.test_pressing())
-        {
-          target->fill_area(0,x,y);
-        }
-      break;
-  case(PaintingMode::transform_area_frame):
-        if(mouse.left.test_pressed())
-        {
-//          area_selection::grab(x,y);
-        }
-
-      else
-        if(mouse.left.test_pressing())
-        {
-//          area_selection::move(x,y);
-        }
-      break;
-  case(PaintingMode::paste):
-        if(mouse.left.test_pressing())
-        {
-          composing_flag = true;
-
-          temporary_clip.clear();
-
-          temporary_clip.put(copy_clip,x,y);
-        }
-
-      else
-        if(mouse.left.test_unpressed())
-        {
-          composing_flag = false;
-
-          target->put(copy_clip,x,y,true);
-        }
-      break;
-  case(PaintingMode::layer):
-        if(mouse.left.test_pressing())
-        {
-          composing_flag = true;
-
-          temporary_clip.clear();
-
-          temporary_clip.put(copy_clip,x,y);
-        }
-
-      else
-        if(mouse.left.test_unpressed())
-        {
-          composing_flag = false;
-
-          target->put(copy_clip,x,y,false);
-        }
-      break;
     }
 
 
@@ -187,38 +304,39 @@ process_mouse(const oat::Mouse&  mouse)
 
 void
 Painter::
-draw_selection_frame()
+draw_selecting_rect()
 {
-/*
   auto&  pt = content.point;
 
-  auto&  rect = area_selection::get_rect();
+  const auto&  rect = operating_rect;
 
-  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
-                                     pt.y+(pixel_size*rect.top),
-                                     (pixel_size*((rect.right-rect.left)+1)),
-                                     (pixel_size*((rect.bottom-rect.top)+1)));
+  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.x),
+                                     pt.y+(pixel_size*rect.y),
+                                          (pixel_size*rect.w),
+                                          (pixel_size*rect.h));
 
-  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
-                                     pt.y+(pixel_size*rect.top),
-                                     pixel_size,
-                                     pixel_size);
+    if(selecting_state == 2)
+    {
+      draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.x),
+                                         pt.y+(pixel_size*rect.y),
+                                         pixel_size,
+                                         pixel_size);
 
-  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.right),
-                                     pt.y+(pixel_size*rect.top),
-                                     pixel_size,
-                                     pixel_size);
+      draw_rect(oat::const_color::yellow,pt.x+(pixel_size*(rect.x+rect.w-1)),
+                                         pt.y+(pixel_size*(rect.y         )),
+                                         pixel_size,
+                                         pixel_size);
 
-  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.left),
-                                     pt.y+(pixel_size*rect.bottom),
-                                     pixel_size,
-                                     pixel_size);
+      draw_rect(oat::const_color::yellow,pt.x+(pixel_size*(rect.x         )),
+                                         pt.y+(pixel_size*(rect.y+rect.h-1)),
+                                         pixel_size,
+                                         pixel_size);
 
-  draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.right),
-                                     pt.y+(pixel_size*rect.bottom),
-                                     pixel_size,
-                                     pixel_size);
-*/
+      draw_rect(oat::const_color::yellow,pt.x+(pixel_size*(rect.x+rect.w-1)),
+                                         pt.y+(pixel_size*(rect.y+rect.h-1)),
+                                         pixel_size,
+                                         pixel_size);
+    }
 }
 
 
@@ -241,14 +359,6 @@ render()
 
   constexpr int  w = SuperCard::width ;
   constexpr int  h = SuperCard::height;
-
-  target->draw(*this,pt.x,pt.y,pixel_size);
-
-    if(composing_flag)
-    {
-      temporary_clip.draw(*this,pt.x,pt.y,pixel_size);
-    }
-
 
     for(int  y = 0;  y < h;  ++y)
     {
@@ -275,23 +385,18 @@ render()
                 pixel_size*h);
 
 
+  target->draw(*this,pt.x,pt.y,pixel_size);
 
-/*
-    if(grid_extent)
+    if(selecting_state)
     {
-      draw_rect(l2,pt.x+pixel_size*4+1,
-                   pt.y+pixel_size*4+1,
-                   pixel_size*(w-8),
-                   pixel_size*(h-8));
+      draw_selecting_rect();
     }
 
-
-    if((PaintingMode::get_index() == tool_selection::transform_area_frame) ||
-        area_selection::test_whether_transformed())
+  else
+    if(composing_flag)
     {
-      draw_selection_frame();
+      temporary_clip.draw(*this,pt.x,pt.y,pixel_size);
     }
-*/
 }
 
 

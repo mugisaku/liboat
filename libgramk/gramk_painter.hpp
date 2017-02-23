@@ -58,20 +58,44 @@ Painter: public oat::Widget
 
   PaintingMode  mode;
 
+  int  selecting_state;
+
   uint8_t  current_color;
 
+  bool  single_pointing_flag;
+
   bool  composing_flag;
-  bool   selected_flag;
 
   oat::Point  point0;
   oat::Point  point1;
 
-  Rect   drawing_rect;
-  Rect  selected_rect;
+  enum class Corner{
+    none,
+    top_left,
+    top_right,
+    bottom_left,
+    bottom_right,
 
-  void  draw_selection_frame();
+  } rect_corner;
 
-  void  process_draw_line(bool  button, int  color, int  x, int  y);
+
+  Rect  operating_rect;
+
+  void  draw_selecting_rect();
+
+  enum class HowToPaste{
+    rehearsal,
+    production,
+    production_with_overwrite,
+  };
+
+
+  void  paste(int  x, int  y, HowToPaste  how);
+
+  void  make_pointing(int  x, int  y);
+  void  form_rect();
+
+  void  move_corner(int  x, int  y);
 
 public:
   Painter(Callback  cb);
@@ -85,7 +109,7 @@ public:
 
   uint8_t  get_current_color() const;
 
-  const Rect&  get_drawing_rect() const;
+  const Rect&  get_operating_rect() const;
 
   void  copy();
 

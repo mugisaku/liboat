@@ -5,6 +5,7 @@
 #include"oat.hpp"
 #include"gramk_packet.hpp"
 #include"gramk_card.hpp"
+#include"gramk_drawing.hpp"
 #include<forward_list>
 
 
@@ -52,8 +53,6 @@ public:
   void  rotate_right(const Rect&  rect);
   void  rotate_down( const Rect&  rect);
 
-  void  draw_rect(int  color, const Rect&  rect);
-  void  fill_rect(int  color, const Rect&  rect);
   void  fill_area(int  color, int  x, int  y);
 
   void  get(Clip&  clip, const Rect&  rect) const;

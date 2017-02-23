@@ -88,36 +88,6 @@ put(const Clip&  clip, int  x, int  y, bool  overwrite)
 
 void
 SuperCard::
-draw_rect(int  color, const Rect&  rect)
-{
-    for(int  xx = 0;  xx < rect.w;  ++xx)
-    {
-      put(color,rect.x+xx,rect.y         );
-      put(color,rect.x+xx,rect.y+rect.h-1);
-    }
-
-
-    for(int  yy = 1;  yy < rect.h-1;  ++yy)
-    {
-      put(color,rect.x         ,rect.y+yy);
-      put(color,rect.x+rect.w-1,rect.y+yy);
-    }
-}
-
-
-void
-SuperCard::
-fill_rect(int  color, const Rect&  rect)
-{
-    for(int  yy = 0;  yy < rect.h;  ++yy){
-    for(int  xx = 0;  xx < rect.w;  ++xx){
-      put(color,rect.x+xx,rect.y+yy);
-    }}
-}
-
-
-void
-SuperCard::
 get(Clip&  clip, const Rect&  rect) const
 {
   int  w = rect.w;
