@@ -28,6 +28,8 @@ AniBox: public oat::Widget
 public:
   AniBox(GetCard  cb);
 
+  void  speed_up();
+  void  speed_down();
   void  push();
   void  pop();
   void  clear();

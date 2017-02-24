@@ -24,22 +24,16 @@ Album: public oat::Widget
 
   std::vector<SuperCard*>  table;
 
-  std::string  png_path;
-
 public:
   Album(Callback  cb);
 
   void  process_mouse(const oat::Mouse&  mouse) override;
   void  render() override;
 
-  void   read(const char*  path);
-  void  write(                 );
+  void   read(FILE*  f);
+  void  write(FILE*  f);
 
   const SuperCard*  get_current() const;
-
-  const char*  get_filepath() const;
-
-  oat::Widget*  create_file_widget();
 
 };
 

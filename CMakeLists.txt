@@ -67,6 +67,7 @@ set(GRAMK_SOURCES
   gramk/gramk_album.cpp
   gramk/gramk_album__file.cpp
   gramk/gramk_anibox.cpp
+  gramk/gramk_pathholder.cpp
 )
 
 

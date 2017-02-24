@@ -6,8 +6,7 @@
 
 Album::
 Album(Callback  cb):
-callback(cb),
-png_path("__new.png")
+callback(cb)
 {
   table.resize(table_width*table_height);
 
@@ -75,50 +74,6 @@ Album::
 get_current() const
 {
   return table[(table_width*cursor.y)+cursor.x];
-}
-
-
-namespace{
-
-
-void
-save(oat::Button&  btn)
-{
-    if(btn->test_unpressed())
-    {
-      static_cast<Album*>(btn.get_userdata())->write();
-    }
-}
-
-
-oat::TextBox*
-textbox;
-
-
-}
-
-
-void
-change_path_text(std::u16string&&  s)
-{
-  textbox->change_string(std::move(s));
-}
-
-
-
-oat::Widget*
-Album::
-create_file_widget()
-{
-  auto  btn = new oat::Button(new oat::Text(u"PNGで保存"),save);
-
-  btn->set_userdata(this);
-
-  textbox = new oat::TextBox(16,1);
-
-  textbox->change_string(u"__new.png");
-
-  return new oat::TableRow({textbox,btn});
 }
 
 

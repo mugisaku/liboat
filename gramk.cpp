@@ -109,6 +109,29 @@ AniBox*
 anibox;
 
 
+PathHolder*
+pathho;
+
+
+void
+save(oat::Button&  btn)
+{
+    if(btn->test_unpressed())
+    {
+      auto&  s = pathho->get();
+
+      auto  f = fopen(s.data(),"wb");
+
+        if(f)
+        {
+          album->write(f);
+        }
+    }
+}
+
+
+
+
 void
 painter_callback(SuperCard*  card)
 {
@@ -120,6 +143,11 @@ void
 album_callback(SuperCard*  card)
 {
     if(card)
+    {
+      painter->change_target(*card);
+    }
+
+  else
     {
       painter->change_target(*card);
     }
@@ -147,26 +175,31 @@ construct_widgets()
   default_style.top_padding    = 2;
   default_style.bottom_padding = 2;
 
+  auto  button = new oat::Button(new oat::Text(u"PNGで保存"),save);
+
   painter = new Painter(painter_callback);
 
   auto  oper = painter->create_oper_widget();
   auto  mode = painter->create_mode_widget();
   auto  plte = painter->create_palette_widget();
 
-  auto  left = new TableRow({painter,new TableColumn({plte,mode,oper})});
-
   album = new Album(album_callback);
+  pathho = new PathHolder();
 
-  auto  file  = album->create_file_widget();
-
-  auto  right = new TableColumn({album,file});
+  auto  right = new TableColumn({album,pathho,button});
 
 
   anibox = new AniBox(anibox_callback);
 
   auto  ctrl = anibox->create_ctrl_widget();
 
-  master.join(new TableRow({left,right,anibox,ctrl}),0,0);
+
+
+  auto  abox = new TableRow({mode,anibox,ctrl});
+
+  auto  left = new TableRow({painter,new TableColumn({plte,abox,oper})});
+
+  master.join(new TableRow({left,right}),0,0);
 
   master.update();
 }
@@ -175,7 +208,15 @@ construct_widgets()
 void
 load(char*  path)
 {
-//  image::read(path);
+  auto  f = fopen(path,"rb");
+
+    if(f)
+    {
+      album->read(f);
+
+      pathho->set(path);
+    }
+
 
   SDL_free(path);
 }

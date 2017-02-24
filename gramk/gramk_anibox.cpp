@@ -3,7 +3,7 @@
 
 
 
-constexpr int  pixel_size = 2;
+constexpr int  pixel_size = 4;
 
 
 
@@ -20,6 +20,23 @@ interval_time(200)
 }
 
 
+
+
+void
+AniBox::
+speed_up()
+{
+  interval_time >>= 1;
+}
+
+
+void
+AniBox::
+speed_down()
+{
+  interval_time <<= 1;
+  interval_time  |= 1;
+}
 
 
 void
@@ -87,7 +104,7 @@ render()
 
     if(list.size())
     {
-      list[current]->draw(*this,pt.x,pt.y);
+      list[current]->draw(*this,pt.x,pt.y,pixel_size);
     }
 }
 
@@ -95,6 +112,26 @@ render()
 
 
 namespace{
+void
+spu_cb(oat::Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+      static_cast<AniBox*>(btn.get_userdata())->speed_up();
+    }
+}
+
+
+void
+spd_cb(oat::Button&  btn)
+{
+    if(btn->test_pressed())
+    {
+      static_cast<AniBox*>(btn.get_userdata())->speed_down();
+    }
+}
+
+
 void
 push_cb(oat::Button&  btn)
 {
@@ -134,13 +171,17 @@ create_ctrl_widget()
 {
   auto  psh_btn = new oat::Button(new oat::Text(u"push"),push_cb);
   auto  pop_btn = new oat::Button(new oat::Text(u"pop"),pop_cb);
-  auto  clr_btn = new oat::Button(new oat::Text(u"clear"),clear_cb);
+  auto  clr_btn = new oat::Button(new oat::Text(u"クリア"),clear_cb);
+  auto  spu_btn = new oat::Button(new oat::Text(u"速く"),spu_cb);
+  auto  spd_btn = new oat::Button(new oat::Text(u"遅く"),spd_cb);
 
+  spu_btn->set_userdata(this);
+  spd_btn->set_userdata(this);
   psh_btn->set_userdata(this);
   pop_btn->set_userdata(this);
   clr_btn->set_userdata(this);
 
-  return new oat::TableColumn({psh_btn,pop_btn,clr_btn});
+  return new oat::TableColumn({psh_btn,pop_btn,clr_btn,spu_btn,spd_btn});
 }
 
 

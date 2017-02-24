@@ -10,7 +10,7 @@ Painter::
 Painter(Callback  cb):
 target(nullptr),
 callback(cb),
-current_color(8|15),
+current_color(0),
 operating_rect(0,0,SuperCard::width,SuperCard::height),
 selecting_state(0),
 rect_corner(Corner::none)

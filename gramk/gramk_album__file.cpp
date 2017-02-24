@@ -121,24 +121,12 @@ test_png(FILE*  f)
 }
 
 
-const char*
-Album::
-get_filepath() const
-{
-  auto  res = png_path.rfind('/');
-
-  return (res == std::string::npos)? png_path.data():&png_path[res+1];
-}
-
-
 void
 Album::
-read(const char*  path)
+read(FILE*  f)
 {
 #ifndef EMSCRIPTEN
-  auto  f = fopen(path,"rb");
-
-    if(f && test_png(f))
+    if(test_png(f))
     {
       png_structp  png = png_create_read_struct(PNG_LIBPNG_VER_STRING,nullptr,nullptr,nullptr);
       png_infop    png_info = png_create_info_struct(png);
@@ -163,11 +151,11 @@ read(const char*  path)
       auto  w = png_get_image_width( png,png_info);
       auto  h = png_get_image_height(png,png_info);
 
-      auto  tt_w = min((w/Card::fixed_width ),table_width );
-      auto  tt_h = min((h/Card::fixed_height),table_height);
+      auto  png_table_w = (w/Card::fixed_width );
+      auto  png_table_h = (h/Card::fixed_height);
 
-      w = Card::fixed_width *tt_w;
-      h = Card::fixed_height*tt_h;
+      auto  tt_w = min(png_table_w,table_width );
+      auto  tt_h = min(png_table_h,table_height);
 
       png_color*  tmp_palette;
 
@@ -186,8 +174,8 @@ read(const char*  path)
         }
 
 
-        for(int  y = 0;  y < table_height;  ++y){
-        for(int  x = 0;  x < table_width ;  ++x){
+        for(int  y = 0;  y < tt_h;  ++y){
+        for(int  x = 0;  x < tt_w;  ++x){
           auto&  c = *table[(table_width*y)+x];
 
             for(int  yy = 0;  yy < Card::fixed_height;  ++yy){
@@ -200,13 +188,6 @@ read(const char*  path)
 
 
       close_read(png,png_info,f);
-
-      png_path = path;
-
-
-      auto  p = std::strrchr(path,'/');
-
-//      change_path_text(oat::unicode::to_u16string(p? (p+1):path));
 	   }
 #endif
 }
@@ -214,57 +195,52 @@ read(const char*  path)
 
 void
 Album::
-write()
+write(FILE*  f)
 {
 #ifndef EMSCRIPTEN
-  auto  f = fopen(png_path.data(),"wb");
+  png_structp  png = png_create_write_struct(PNG_LIBPNG_VER_STRING,nullptr,nullptr,nullptr);
 
-    if(f)
-    {
-      png_structp  png = png_create_write_struct(PNG_LIBPNG_VER_STRING,nullptr,nullptr,nullptr);
+  png_infop  png_info = png_create_info_struct(png);
 
-      png_infop  png_info = png_create_info_struct(png);
+  png_init_io(png,f);
 
-      png_init_io(png,f);
+  png_set_compression_level(png,Z_BEST_COMPRESSION);
 
-      png_set_compression_level(png,Z_BEST_COMPRESSION);
+  const int  w = Card::fixed_width*table_width;
+  const int  h = Card::fixed_height*table_height;
 
-      const int  w = Card::fixed_width*table_width;
-      const int  h = Card::fixed_height*table_height;
+  png_set_IHDR(png,png_info,w,h,4,
+               PNG_COLOR_TYPE_PALETTE,
+               PNG_INTERLACE_NONE,
+               PNG_COMPRESSION_TYPE_DEFAULT,
+               PNG_FILTER_TYPE_DEFAULT);
 
-      png_set_IHDR(png,png_info,w,h,4,
-                   PNG_COLOR_TYPE_PALETTE,
-                   PNG_INTERLACE_NONE,
-                   PNG_COMPRESSION_TYPE_DEFAULT,
-                   PNG_FILTER_TYPE_DEFAULT);
+  png_set_PLTE(png,png_info,png_palette,16);
 
-      png_set_PLTE(png,png_info,png_palette,16);
+  png_write_info(png,png_info);
 
-      png_write_info(png,png_info);
+  png_set_packing(png);
 
-      png_set_packing(png);
+  std::vector<uint8_t>  buffer(w*h);
 
-      std::vector<uint8_t>  buffer(w*h);
+    for(int  y = 0;  y < table_height;  ++y){
+    for(int  x = 0;  x < table_width ;  ++x){
+      auto&  c = *table[(table_width*y)+x];
 
-        for(int  y = 0;  y < table_height;  ++y){
-        for(int  x = 0;  x < table_width ;  ++x){
-          auto&  c = *table[(table_width*y)+x];
-
-            for(int  yy = 0;  yy < Card::fixed_height;  ++yy){
-            for(int  xx = 0;  xx < Card::fixed_width ;  ++xx){
-              buffer[(w*Card::fixed_height*y)+(w*yy)+(Card::fixed_width*x)+xx] = c.Card::get(xx,yy);
-            }}
+        for(int  yy = 0;  yy < Card::fixed_height;  ++yy){
+        for(int  xx = 0;  xx < Card::fixed_width ;  ++xx){
+          buffer[(w*Card::fixed_height*y)+(w*yy)+(Card::fixed_width*x)+xx] = c.Card::get(xx,yy);
         }}
+    }}
 
 
-        for(int  y = 0;  y < h;  ++y)
-        {
-          png_write_row(png,&buffer[w*y]);
-        }
-
-
-      close_write(png,png_info,f);
+    for(int  y = 0;  y < h;  ++y)
+    {
+      png_write_row(png,&buffer[w*y]);
     }
+
+
+  close_write(png,png_info,f);
 #endif
 }
 
