@@ -232,7 +232,7 @@ revolve(Button&  btn)
 
 
 void
-fn(CheckForm::Member&  member)
+fn(CheckForm&  frm, CheckForm::Member&  member)
 {
     if(member.current)
     {

@@ -1,5 +1,5 @@
 #include"oat.hpp"
-#include"libgramk/gramk.hpp"
+#include"gramk.hpp"
 #include"sdlut.hpp"
 
 
