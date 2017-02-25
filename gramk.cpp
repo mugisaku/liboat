@@ -133,14 +133,14 @@ save(oat::Button&  btn)
 
 
 void
-painter_callback(SuperCard*  card)
+painter_callback(Card*  card)
 {
   album->need_to_redraw();
 }
 
 
 void
-album_callback(SuperCard*  card)
+album_callback(Card*  card)
 {
     if(card)
     {
@@ -149,7 +149,6 @@ album_callback(SuperCard*  card)
 
   else
     {
-      painter->change_target(*card);
     }
 }
 
@@ -296,7 +295,7 @@ main(int  argc,  char**  argv)
 
   auto&  m = oat::master.get_module();
 
-  screen.create("animk - " __DATE__,m.get_width(),m.get_height());
+  screen.create("gramk - " __DATE__,m.get_width(),m.get_height());
 
   update_screen();
 

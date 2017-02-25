@@ -1,5 +1,4 @@
 #include"gramk_painter.hpp"
-#include"gramk_drawing.hpp"
 #include<cstring>
 #include<algorithm>
 
@@ -11,12 +10,12 @@ Painter(Callback  cb):
 target(nullptr),
 callback(cb),
 current_color(0),
-operating_rect(0,0,SuperCard::width,SuperCard::height),
+operating_rect(0,0,Card::width,Card::height),
 selecting_state(0),
 rect_corner(Corner::none)
 {
-  change_content_width( SuperCard::width *pixel_size);
-  change_content_height(SuperCard::height*pixel_size);
+  change_content_width( Card::width *pixel_size);
+  change_content_height(Card::height*pixel_size);
 
   style.background_color = oat::const_color::blue;
 
@@ -28,7 +27,7 @@ rect_corner(Corner::none)
 
 void
 Painter::
-change_target(SuperCard&  card)
+change_target(Card&  card)
 {
   target = &card;
 
@@ -51,56 +50,53 @@ change_mode(PaintingMode  mode_)
 
   composing_flag  = false;
 
-  point0.x = -1;
-  point1.x = -1;
-
   single_pointing_flag = ((mode == PaintingMode::draw_point) ||
                           (mode == PaintingMode::fill_area)  ||
                           (mode == PaintingMode::paste)      ||
                           (mode == PaintingMode::layer));
 
+    if(mode == PaintingMode::paste)
+    {
+    }
+
+  else
+    if(mode == PaintingMode::layer)
+    {
+    }
+
+
   need_to_redraw();
 }
 
 
-SuperCard*  Painter::get_target() const{return target;}
+Card*  Painter::get_target() const{return target;}
 
 
 uint8_t  Painter::get_current_color() const{return current_color;}
 
 
-const Rect&  Painter::get_operating_rect() const{return operating_rect;}
+const Rect&
+Painter::
+get_operating_rect() const
+{
+  static const Rect  tmp_rect(0,0,Card::width,Card::height);
+
+  return selecting_state? operating_rect:tmp_rect;
+}
 
 
 void
 Painter::
 copy()
 {
-  Rect  rect = (point0.x >= 0)? operating_rect:Rect(0,0,SuperCard::width,SuperCard::height);
+  copy_card.clear();
 
-  target->get(copy_clip,rect);
-}
+  auto&  rect = get_operating_rect();
 
+  Card::transfer(*target,rect,copy_card,0,0,true);
 
-
-
-namespace{
-void
-clip_cb(void*  that, int  color, int  x, int  y)
-{
-  auto&  c = *static_cast<Clip*>(that);
-
-  c.Card::put(color,x,y);
-}
-
-
-void
-scard_cb(void*  that, int  color, int  x, int  y)
-{
-  auto&  c = *static_cast<SuperCard*>(that);
-
-  c.put(color,x,y);
-}
+  copy_rect.w = rect.w;
+  copy_rect.h = rect.h;
 }
 
 
@@ -115,8 +111,6 @@ make_pointing(int  x, int  y)
       point0.reset(x,y);
       point1.reset(x,y);
 
-      temporary_clip.change_size(SuperCard::width,SuperCard::height);
-
       composing_flag = true;
     }
 
@@ -124,22 +118,22 @@ make_pointing(int  x, int  y)
     {
       point1.reset(x,y);
 
-      temporary_clip.clear();
+      temporary_card.clear();
 
         switch(mode)
         {
       case(PaintingMode::draw_line):
-          drawing::draw_line(&temporary_clip,clip_cb,current_color,point0,point1);
+          temporary_card.draw_line(current_color,point0,point1);
           break;
       case(PaintingMode::draw_rect):
           form_rect();
 
-          drawing::draw_rect(&temporary_clip,clip_cb,current_color,operating_rect);
+          temporary_card.draw_rect(current_color,operating_rect);
           break;
       case(PaintingMode::fill_rect):
           form_rect();
 
-          drawing::fill_rect(&temporary_clip,clip_cb,current_color,operating_rect);
+          temporary_card.fill_rect(current_color,operating_rect);
           break;
       case(PaintingMode::transform_area_frame):
           form_rect();
@@ -171,23 +165,39 @@ form_rect()
 
 void
 Painter::
-paste(int  x, int  y, HowToPaste  how)
+paste(int  x, int  y, bool  rehearsal)
 {
-    if(how == HowToPaste::rehearsal)
+    if(rehearsal)
     {
       composing_flag = true;
 
-      temporary_clip.clear();
+      temporary_card.clear();
 
-      temporary_clip.put(copy_clip,x,y);
+      Card::transfer(copy_card,copy_rect,temporary_card,x,y,false);
     }
 
   else
     {
       composing_flag = false;
 
-      target->put(copy_clip,x,y,(how == HowToPaste::production_with_overwrite));
+      target->prepare_new_log();
+
+      Card::transfer(copy_card,copy_rect,*target,x,y,true);
+
+      target->prepare_new_log(true);
     }
+}
+
+
+void
+Painter::
+fill_area(int  color, int  x, int  y)
+{
+  target->prepare_new_log();
+
+  target->fill_area(color,x,y);
+
+  target->prepare_new_log(true);
 }
 
 
@@ -211,20 +221,20 @@ process_mouse(const oat::Mouse&  mouse)
         switch(mode)
         {
       case(PaintingMode::draw_point):
-               if(mouse.left.test_pressing() ){target->put(current_color|8,x,y);}
-          else if(mouse.right.test_pressing()){target->put(              0,x,y);}
+               if(mouse.left.test_pressing() ){target->put_color(current_color|8,x,y);}
+          else if(mouse.right.test_pressing()){target->put_color(              0,x,y);}
           break;
       case(PaintingMode::fill_area):
-               if(mouse.left.test_pressing() ){target->fill_area(current_color|8,x,y);}
-          else if(mouse.right.test_pressing()){target->fill_area(              0,x,y);}
+               if(mouse.left.test_pressing() ){fill_area(current_color|8,x,y);}
+          else if(mouse.right.test_pressing()){fill_area(              0,x,y);}
           break;
       case(PaintingMode::paste):
-               if(mouse.left.test_pressing() ){paste(x,y,HowToPaste::rehearsal );}
-          else if(mouse.left.test_unpressed()){paste(x,y,HowToPaste::production_with_overwrite);}
+            if(mouse.left.test_unpressed()){paste(x,y,false);}
+          else                             {paste(x,y,true );}
           break;
       case(PaintingMode::layer):
-               if(mouse.left.test_pressing() ){paste(x,y,HowToPaste::rehearsal );}
-          else if(mouse.left.test_unpressed()){paste(x,y,HowToPaste::production);}
+            if(mouse.left.test_unpressed()){paste(x,y,false);}
+          else                             {paste(x,y,true );}
           break;
         }
     }
@@ -234,9 +244,6 @@ process_mouse(const oat::Mouse&  mouse)
     {
 CANCEL:
       composing_flag = false;
-
-      point0.x = -1;
-      point1.x = -1;
     }
 
   else
@@ -261,7 +268,7 @@ CANCEL:
       case(PaintingMode::draw_line):
           target->prepare_new_log();
 
-          drawing::draw_line(target,scard_cb,current_color,point0,point1);
+          target->draw_line(current_color,point0,point1);
 
           target->prepare_new_log(true);
 
@@ -270,7 +277,7 @@ CANCEL:
       case(PaintingMode::draw_rect):
           target->prepare_new_log();
 
-          drawing::draw_rect(target,scard_cb,current_color,operating_rect);
+          target->draw_rect(current_color,operating_rect);
 
           target->prepare_new_log(true);
 
@@ -279,7 +286,7 @@ CANCEL:
       case(PaintingMode::fill_rect):
           target->prepare_new_log();
 
-          drawing::fill_rect(target,scard_cb,current_color,operating_rect);
+          target->fill_rect(current_color,operating_rect);
 
           target->prepare_new_log(true);
 
@@ -357,8 +364,22 @@ render()
   constexpr oat::Color  l1(0x7F,0x7F,0x0);
   constexpr oat::Color  l2(0xFF,0xFF,0x00);
 
-  constexpr int  w = SuperCard::width ;
-  constexpr int  h = SuperCard::height;
+  constexpr int  w = Card::width ;
+  constexpr int  h = Card::height;
+
+  target->render(*this,pt.x,pt.y,w,h,pixel_size);
+
+    if(selecting_state)
+    {
+      draw_selecting_rect();
+    }
+
+
+    if(composing_flag)
+    {
+      temporary_card.render(*this,pt.x,pt.y,w,h,pixel_size);
+    }
+
 
     for(int  y = 0;  y < h;  ++y)
     {
@@ -383,20 +404,6 @@ render()
   draw_vline(l2,pt.x+pixel_size*(w/2)+1,
                 pt.y,
                 pixel_size*h);
-
-
-  target->draw(*this,pt.x,pt.y,pixel_size);
-
-    if(selecting_state)
-    {
-      draw_selecting_rect();
-    }
-
-  else
-    if(composing_flag)
-    {
-      temporary_clip.draw(*this,pt.x,pt.y,pixel_size);
-    }
 }
 
 

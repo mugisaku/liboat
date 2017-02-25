@@ -39,8 +39,7 @@ abc2wav  簡易ABC記譜法によるテキストファイルを、WAVE形式で�
 
 
 ビルドシステムにcmakeを使います
-builddirに入って
-  cmake ..
+  cmake .
 とすれば、Makefileができるので、続けて
   make
 としましょう

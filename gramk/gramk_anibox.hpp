@@ -20,6 +20,8 @@ AniBox: public oat::Widget
 
   int  current;
 
+  char16_t  character;
+
   GetCard  callback;
 
   uint32_t      last_time;

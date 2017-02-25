@@ -3,8 +3,7 @@
 
 
 #include"oat.hpp"
-#include"gramk_supercard.hpp"
-#include"gramk_clip.hpp"
+#include"gramk_card.hpp"
 
 
 
@@ -41,7 +40,7 @@ PaintingMode
 };
 
 
-using Callback = void  (*)(SuperCard*  card);
+using Callback = void  (*)(Card*  card);
 
 
 class
@@ -49,12 +48,14 @@ Painter: public oat::Widget
 {
   static constexpr int  pixel_size = 10;
 
-  SuperCard*  target;
+  Card*  target;
 
   Callback  callback;
 
-  Clip       copy_clip;
-  Clip  temporary_clip;
+  Rect  copy_rect;
+
+  Card       copy_card;
+  Card  temporary_card;
 
   PaintingMode  mode;
 
@@ -83,14 +84,10 @@ Painter: public oat::Widget
 
   void  draw_selecting_rect();
 
-  enum class HowToPaste{
-    rehearsal,
-    production,
-    production_with_overwrite,
-  };
 
+  void  fill_area(int  color, int  x, int  y);
 
-  void  paste(int  x, int  y, HowToPaste  how);
+  void  paste(int  x, int  y, bool  rehearsal);
 
   void  make_pointing(int  x, int  y);
   void  form_rect();
@@ -100,12 +97,12 @@ Painter: public oat::Widget
 public:
   Painter(Callback  cb);
 
-  void  change_target(SuperCard&  card);
+  void  change_target(Card&  card);
 
   void  change_current_color(uint8_t  color);
   void  change_mode(PaintingMode  mode_);
 
-  SuperCard*  get_target() const;
+  Card*  get_target() const;
 
   uint8_t  get_current_color() const;
 

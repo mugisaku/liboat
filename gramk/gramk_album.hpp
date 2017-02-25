@@ -4,7 +4,6 @@
 
 #include"oat.hpp"
 #include"gramk_card.hpp"
-#include"gramk_supercard.hpp"
 #include"gramk_painter.hpp"
 #include<string>
 
@@ -22,7 +21,7 @@ Album: public oat::Widget
 
   oat::Point  cursor;
 
-  std::vector<SuperCard*>  table;
+  std::vector<Card*>  table;
 
 public:
   Album(Callback  cb);
@@ -33,7 +32,7 @@ public:
   void   read(FILE*  f);
   void  write(FILE*  f);
 
-  const SuperCard*  get_current() const;
+  const Card*  get_current() const;
 
 };
 

@@ -1,5 +1,4 @@
 #include"gramk_painter.hpp"
-#include"gramk_drawing.hpp"
 #include<cstring>
 #include<algorithm>
 

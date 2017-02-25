@@ -12,11 +12,12 @@ AniBox::
 AniBox(GetCard  cb):
 callback(cb),
 current(0),
+character('0'),
 last_time(0),
 interval_time(200)
 {
-  change_content_width( Card::fixed_width *pixel_size);
-  change_content_height(Card::fixed_height*pixel_size);
+  change_content_width( Card::width *pixel_size                  );
+  change_content_height(Card::height*pixel_size+oat::font::height);
 }
 
 
@@ -43,7 +44,12 @@ void
 AniBox::
 push()
 {
-  list.emplace_back(callback());
+    if(list.size() < 9)
+    {
+      list.emplace_back(callback());
+
+      ++character;
+    }
 }
 
 
@@ -55,6 +61,8 @@ pop()
     {
       list.pop_back();
 
+      --character;
+
       current = 0;
     }
 }
@@ -65,6 +73,8 @@ AniBox::
 clear()
 {
   list.clear();
+
+  character = '0';
 
   current = 0;
 }
@@ -104,8 +114,11 @@ render()
 
     if(list.size())
     {
-      list[current]->draw(*this,pt.x,pt.y,pixel_size);
+      list[current]->render(*this,pt.x,pt.y,Card::width,Card::height,pixel_size);
     }
+
+
+  draw_unicode(oat::const_color::white,character,pt.x,pt.y+(pixel_size*Card::height));
 }
 
 

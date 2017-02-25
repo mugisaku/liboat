@@ -11,7 +11,6 @@ endif(CCACHE_FOUND)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_BUILD_TYPE Debug)
 
-set(CMAKE_BINARY_DIR build)
 set(CMAKE_C_COMPILER  gcc)
 set(CMAKE_C_FLAGS   "-std=c11 -Werror -march=core2")
 set(CMAKE_C_FLAGS_RELEASE "-Os -fomit-frame-pointer")
@@ -53,12 +52,11 @@ set(OAT_SOURCES
 
 
 set(GRAMK_SOURCES
-  gramk/gramk_drawing.cpp
   gramk/gramk_card.cpp
-  gramk/gramk_clip.cpp
-  gramk/gramk_supercard.cpp
-  gramk/gramk_supercard__shift.cpp
-  gramk/gramk_supercard__fill_area.cpp
+  gramk/gramk_card__log.cpp
+  gramk/gramk_card__draw.cpp
+  gramk/gramk_card__operate.cpp
+  gramk/gramk_card__fill_area.cpp
   gramk/gramk_painter.cpp
   gramk/gramk_painter__move_corner.cpp
   gramk/gramk_painter__create_oper_widget.cpp

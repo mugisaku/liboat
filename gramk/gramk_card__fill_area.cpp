@@ -1,4 +1,4 @@
-#include"gramk_supercard.hpp"
+#include"gramk_card.hpp"
 #include<cstring>
 
 
@@ -8,14 +8,14 @@ namespace{
 
 
 bool
-table[80][80];
+table[Card::height][Card::width];
 
 
 }
 
 
 void
-SuperCard::
+Card::
 subroutine_for_fill_area(int  color, int  x, int  y, int  target)
 {
   auto&  e = table[y][x];
@@ -24,9 +24,9 @@ subroutine_for_fill_area(int  color, int  x, int  y, int  target)
     {
       e = true;
 
-        if(Card::get(x,y) == target)
+        if(get_color(x,y) == target)
         {
-          put(color,x,y);
+          put_color(color,x,y);
 
             if(x             ){subroutine_for_fill_area(color,x-1,y  ,target);}
             if(y             ){subroutine_for_fill_area(color,x  ,y-1,target);}
@@ -39,10 +39,10 @@ subroutine_for_fill_area(int  color, int  x, int  y, int  target)
 
 
 void
-SuperCard::
+Card::
 fill_area(int  color, int  x, int  y)
 {
-  auto  target = Card::get(x,y);
+  auto  target = get_color(x,y);
 
     if(target != color)
     {

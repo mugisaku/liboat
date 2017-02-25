@@ -188,7 +188,7 @@ rotate_up(Button&  btn)
 
     if(btn->test_unpressed())
     {
-      p.get_target()->rotate_up(p.get_operating_rect());
+      p.get_target()->shift_up(p.get_operating_rect(),true);
 
       p.need_to_redraw();
     }
@@ -202,7 +202,7 @@ rotate_left(Button&  btn)
 
     if(btn->test_unpressed())
     {
-      p.get_target()->rotate_left(p.get_operating_rect());
+      p.get_target()->shift_left(p.get_operating_rect(),true);
 
       p.need_to_redraw();
     }
@@ -216,7 +216,7 @@ rotate_right(Button&  btn)
 
     if(btn->test_unpressed())
     {
-      p.get_target()->rotate_right(p.get_operating_rect());
+      p.get_target()->shift_right(p.get_operating_rect(),true);
 
       p.need_to_redraw();
     }
@@ -230,7 +230,7 @@ rotate_down(Button&  btn)
 
     if(btn->test_unpressed())
     {
-      p.get_target()->rotate_down(p.get_operating_rect());
+      p.get_target()->shift_down(p.get_operating_rect(),true);
 
       p.need_to_redraw();
     }

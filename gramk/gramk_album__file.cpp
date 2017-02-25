@@ -151,8 +151,8 @@ read(FILE*  f)
       auto  w = png_get_image_width( png,png_info);
       auto  h = png_get_image_height(png,png_info);
 
-      auto  png_table_w = (w/Card::fixed_width );
-      auto  png_table_h = (h/Card::fixed_height);
+      auto  png_table_w = (w/Card::width );
+      auto  png_table_h = (h/Card::height);
 
       auto  tt_w = min(png_table_w,table_width );
       auto  tt_h = min(png_table_h,table_height);
@@ -178,12 +178,17 @@ read(FILE*  f)
         for(int  x = 0;  x < tt_w;  ++x){
           auto&  c = *table[(table_width*y)+x];
 
-            for(int  yy = 0;  yy < Card::fixed_height;  ++yy){
-            for(int  xx = 0;  xx < Card::fixed_width ;  ++xx){
-              auto  v = buffer[(w*Card::fixed_height*y)+(w*yy)+(Card::fixed_width*x)+xx];
+          c.unset_recording_flag();
 
-              c.put_without_logging(v,xx,yy);
+            for(int  yy = 0;  yy < Card::height;  ++yy){
+            for(int  xx = 0;  xx < Card::width ;  ++xx){
+              auto  v = buffer[(w*Card::height*y)+(w*yy)+(Card::width*x)+xx];
+
+              c.put_color(v,xx,yy);
             }}
+
+
+          c.set_recording_flag();
         }}
 
 
@@ -206,8 +211,8 @@ write(FILE*  f)
 
   png_set_compression_level(png,Z_BEST_COMPRESSION);
 
-  const int  w = Card::fixed_width*table_width;
-  const int  h = Card::fixed_height*table_height;
+  const int  w = Card::width*table_width;
+  const int  h = Card::height*table_height;
 
   png_set_IHDR(png,png_info,w,h,4,
                PNG_COLOR_TYPE_PALETTE,
@@ -227,9 +232,9 @@ write(FILE*  f)
     for(int  x = 0;  x < table_width ;  ++x){
       auto&  c = *table[(table_width*y)+x];
 
-        for(int  yy = 0;  yy < Card::fixed_height;  ++yy){
-        for(int  xx = 0;  xx < Card::fixed_width ;  ++xx){
-          buffer[(w*Card::fixed_height*y)+(w*yy)+(Card::fixed_width*x)+xx] = c.Card::get(xx,yy);
+        for(int  yy = 0;  yy < Card::height;  ++yy){
+        for(int  xx = 0;  xx < Card::width ;  ++xx){
+          buffer[(w*Card::height*y)+(w*yy)+(Card::width*x)+xx] = c.get_color(xx,yy);
         }}
     }}
 
