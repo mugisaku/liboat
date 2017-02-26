@@ -59,8 +59,8 @@ render()
     for(int  x = 0;  x <  table_width;  ++x){
       auto&  c = *table[(table_width*y)+x];
 
-      c.render(*this,pt.x+(Card::width *x),
-                     pt.y+(Card::height*y),Card::width,Card::height);
+      c.render(Card::width,Card::height,*this,pt.x+(Card::width *x),
+                                              pt.y+(Card::height*y));
     }}
 
 

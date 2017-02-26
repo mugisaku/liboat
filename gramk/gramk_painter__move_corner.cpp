@@ -89,7 +89,7 @@ void
 Painter::
 move_corner(int  x, int  y)
 {
-  auto&  rect = operating_rect;
+  auto&  rect = selecting_rect;
 
   const int  x_max = (rect.x+rect.w-1);
   const int  y_max = (rect.y+rect.h-1);

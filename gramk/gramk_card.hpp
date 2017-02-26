@@ -5,26 +5,10 @@
 #include<cstdint>
 #include"oat.hpp"
 #include"gramk_packet.hpp"
+#include"gramk_rect.hpp"
 #include<forward_list>
 
 
-
-
-struct
-Rect
-{
-  int  x;
-  int  y;
-  int  w;
-  int  h;
-
-  constexpr Rect(int  x_=0, int  y_=0, int  w_=0, int  h_=0):
-  x(x_),
-  y(y_),
-  w(w_),
-  h(h_){}
-
-};
 
 
 class
@@ -33,6 +17,8 @@ Card
 public:
   static constexpr int  width  = 24;
   static constexpr int  height = 48;
+
+  static const Rect  whole_rect;
 
 protected:
   uint8_t  color_table[height][width];
@@ -68,7 +54,7 @@ public:
 
   void  prepare_new_log(bool  solid_flag=false);
 
-  void  render(oat::Widget&  dst, int  x, int  y, int  w, int  h, int  pixel_size=1) const;
+  void  render(int  src_w, int  src_h, oat::Widget&  dst, int  dst_x, int  dst_y, int  pixel_size=1) const;
 
 
   void  revolve(             const Rect&  rect);

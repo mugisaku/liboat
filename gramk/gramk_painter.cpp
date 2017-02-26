@@ -44,25 +44,30 @@ change_mode(PaintingMode  mode_)
 {
   mode = mode_;
 
-       if(selecting_state == 1){selecting_state = 2;}
-  else if(selecting_state == 2){selecting_state = 1;}
+    if(mode == PaintingMode::transform_area_frame)
+    {
+        if(selecting_state == 1)
+        {
+          selecting_state = 2;
+        }
+    }
+
+  else
+    {
+        if(selecting_state == 2)
+        {
+          selecting_state = 1;
+        }
+    }
 
 
-  composing_flag  = false;
+   pointing_flag = false;
+  composing_flag = false;
 
   single_pointing_flag = ((mode == PaintingMode::draw_point) ||
                           (mode == PaintingMode::fill_area)  ||
                           (mode == PaintingMode::paste)      ||
                           (mode == PaintingMode::layer));
-
-    if(mode == PaintingMode::paste)
-    {
-    }
-
-  else
-    if(mode == PaintingMode::layer)
-    {
-    }
 
 
   need_to_redraw();
@@ -79,24 +84,15 @@ const Rect&
 Painter::
 get_operating_rect() const
 {
-  static const Rect  tmp_rect(0,0,Card::width,Card::height);
-
-  return selecting_state? operating_rect:tmp_rect;
+  return operating_rect;
 }
 
 
-void
+const Rect&
 Painter::
-copy()
+get_selecting_rect() const
 {
-  copy_card.clear();
-
-  auto&  rect = get_operating_rect();
-
-  Card::transfer(*target,rect,copy_card,0,0,true);
-
-  copy_rect.w = rect.w;
-  copy_rect.h = rect.h;
+  return selecting_state? selecting_rect:Card::whole_rect;
 }
 
 
@@ -106,37 +102,43 @@ void
 Painter::
 make_pointing(int  x, int  y)
 {
-    if(point0.x < 0)
+    if(!pointing_flag)
     {
       point0.reset(x,y);
       point1.reset(x,y);
 
-      composing_flag = true;
+      pointing_flag = true;
     }
 
   else
     {
       point1.reset(x,y);
 
-      temporary_card.clear();
+      Card::transfer(*target,Card::whole_rect,temporary_card,0,0,true);
 
         switch(mode)
         {
       case(PaintingMode::draw_line):
-          temporary_card.draw_line(current_color,point0,point1);
+          composing_flag = true;
+
+          temporary_card.draw_line(current_color|8,point0,point1);
           break;
       case(PaintingMode::draw_rect):
-          form_rect();
+          composing_flag = true;
 
-          temporary_card.draw_rect(current_color,operating_rect);
+          operating_rect.form(point0,point1);
+
+          temporary_card.draw_rect(current_color|8,operating_rect);
           break;
       case(PaintingMode::fill_rect):
-          form_rect();
+          composing_flag = true;
 
-          temporary_card.fill_rect(current_color,operating_rect);
+          operating_rect.form(point0,point1);
+
+          temporary_card.fill_rect(current_color|8,operating_rect);
           break;
       case(PaintingMode::transform_area_frame):
-          form_rect();
+          selecting_rect.form(point0,point1);
 
           selecting_state = 1;
           break;
@@ -145,44 +147,42 @@ make_pointing(int  x, int  y)
 }
 
 
+
+
 void
 Painter::
-form_rect()
+copy()
 {
-  const int  x_min = std::min(point0.x,point1.x);
-  const int  x_max = std::max(point0.x,point1.x);
-  const int  y_min = std::min(point0.y,point1.y);
-  const int  y_max = std::max(point0.y,point1.y);
+  copy_card.clear();
 
-  operating_rect.x =       x_min;
-  operating_rect.y =       y_min;
-  operating_rect.w = x_max-x_min+1;
-  operating_rect.h = y_max-y_min+1;
+  auto&  rect = selecting_rect;
+
+  Card::transfer(*target,rect,copy_card,0,0,true);
+
+  copy_rect.w = rect.w;
+  copy_rect.h = rect.h;
 }
 
 
-
-
 void
 Painter::
-paste(int  x, int  y, bool  rehearsal)
+paste(int  x, int  y, bool  overwrite, bool  rehearsal)
 {
+  composing_flag = true;
+
+  paste_point.reset(x,y);
+
     if(rehearsal)
     {
-      composing_flag = true;
-
-      temporary_card.clear();
-
-      Card::transfer(copy_card,copy_rect,temporary_card,x,y,false);
+      Card::transfer(  *target,Card::whole_rect,temporary_card,0,0,true);
+      Card::transfer(copy_card,       copy_rect,temporary_card,x,y,overwrite);
     }
 
   else
     {
-      composing_flag = false;
-
       target->prepare_new_log();
 
-      Card::transfer(copy_card,copy_rect,*target,x,y,true);
+      Card::transfer(copy_card,copy_rect,*target,x,y,overwrite);
 
       target->prepare_new_log(true);
     }
@@ -229,12 +229,12 @@ process_mouse(const oat::Mouse&  mouse)
           else if(mouse.right.test_pressing()){fill_area(              0,x,y);}
           break;
       case(PaintingMode::paste):
-            if(mouse.left.test_unpressed()){paste(x,y,false);}
-          else                             {paste(x,y,true );}
+            if(mouse.left.test_unpressed()){paste(x,y,true,false);}
+          else                             {paste(x,y,true,true );}
           break;
       case(PaintingMode::layer):
-            if(mouse.left.test_unpressed()){paste(x,y,false);}
-          else                             {paste(x,y,true );}
+            if(mouse.left.test_unpressed()){paste(x,y,false,false);}
+          else                             {paste(x,y,false,true );}
           break;
         }
     }
@@ -242,22 +242,19 @@ process_mouse(const oat::Mouse&  mouse)
   else
     if(mouse.right.test_pressing())
     {
-CANCEL:
-      composing_flag = false;
+      pointing_flag = false;
+
+        if(mode == PaintingMode::transform_area_frame)
+        {
+          selecting_state = 0;
+        }
     }
 
   else
     if(mouse.left.test_pressing())
     {
-        if(selecting_state == 2)
-        {
-          move_corner(x,y);
-        }
-
-      else
-        {
-          make_pointing(x,y);
-        }
+        if(selecting_state == 2){move_corner(  x,y);}
+      else                      {make_pointing(x,y);}
     }
 
   else
@@ -268,29 +265,23 @@ CANCEL:
       case(PaintingMode::draw_line):
           target->prepare_new_log();
 
-          target->draw_line(current_color,point0,point1);
+          target->draw_line(current_color|8,point0,point1);
 
           target->prepare_new_log(true);
-
-          goto CANCEL;
           break;
       case(PaintingMode::draw_rect):
           target->prepare_new_log();
 
-          target->draw_rect(current_color,operating_rect);
+          target->draw_rect(current_color|8,operating_rect);
 
           target->prepare_new_log(true);
-
-          goto CANCEL;
           break;
       case(PaintingMode::fill_rect):
           target->prepare_new_log();
 
-          target->fill_rect(current_color,operating_rect);
+          target->fill_rect(current_color|8,operating_rect);
 
           target->prepare_new_log(true);
-
-          goto CANCEL;
           break;
       case(PaintingMode::transform_area_frame):
           selecting_state = 2;
@@ -298,6 +289,10 @@ CANCEL:
           rect_corner = Corner::none;
           break;
         }
+
+
+       pointing_flag = false;
+      composing_flag = false;
     }
 
 
@@ -315,7 +310,7 @@ draw_selecting_rect()
 {
   auto&  pt = content.point;
 
-  const auto&  rect = operating_rect;
+  const auto&  rect = selecting_rect;
 
   draw_rect(oat::const_color::yellow,pt.x+(pixel_size*rect.x),
                                      pt.y+(pixel_size*rect.y),
@@ -367,17 +362,15 @@ render()
   constexpr int  w = Card::width ;
   constexpr int  h = Card::height;
 
-  target->render(*this,pt.x,pt.y,w,h,pixel_size);
-
-    if(selecting_state)
-    {
-      draw_selecting_rect();
-    }
-
 
     if(composing_flag)
     {
-      temporary_card.render(*this,pt.x,pt.y,w,h,pixel_size);
+      temporary_card.render(Card::width,Card::height,*this,pt.x,pt.y,pixel_size);
+    }
+
+  else
+    {
+      target->render(Card::width,Card::height,*this,pt.x,pt.y,pixel_size);
     }
 
 
@@ -404,6 +397,11 @@ render()
   draw_vline(l2,pt.x+pixel_size*(w/2)+1,
                 pt.y,
                 pixel_size*h);
+
+    if(selecting_state)
+    {
+      draw_selecting_rect();
+    }
 }
 
 

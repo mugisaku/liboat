@@ -5,6 +5,11 @@
 
 
 
+const Rect
+Card::
+whole_rect = Rect(0,0,width,height);
+
+
 void
 Card::
 transfer(const Card&  src, const Rect&  src_rect,
@@ -12,7 +17,9 @@ transfer(const Card&  src, const Rect&  src_rect,
 {
     for(int  yy = 0;  yy < src_rect.h;  ++yy)
     {
-        if((dst_y+yy) >= height)
+      const int  yyy = (dst_y+yy);
+
+        if(yyy >= height)
         {
           break;
         }
@@ -20,7 +27,9 @@ transfer(const Card&  src, const Rect&  src_rect,
 
         for(int  xx = 0;  xx < src_rect.w;  ++xx)
         {
-            if((dst_x+xx) >= width)
+          const int  xxx = (dst_x+xx);
+
+            if(xxx >= width)
             {
               break;
             }
@@ -30,7 +39,7 @@ transfer(const Card&  src, const Rect&  src_rect,
 
             if(overwrite || (v&8))
             {
-              dst.put_color(v,dst_x+xx,dst_y+yy);
+              dst.put_color(v,xxx,yyy);
             }
         }
     }
@@ -122,22 +131,24 @@ clear(bool  perfectly)
 
 void
 Card::
-render(oat::Widget&  dst, int  x, int  y, int  w, int  h, int  pixel_size) const
+render(int  src_w, int  src_h, oat::Widget&  dst, int  dst_x, int  dst_y, int  pixel_size) const
 {
-    for(int  yy = 0;  yy < h;  ++yy){
-    for(int  xx = 0;  xx < w;  ++xx){
-      auto  v = get_color(xx,yy);
+    for(int  yy = 0;  yy < src_h;  ++yy)
+    {
+      const int  yyy = dst_y+(pixel_size*yy);
 
-        if(v&8)
+        for(int  xx = 0;  xx < src_w;  ++xx)
         {
-          dst.fill_rect(palette[v&7],x+(pixel_size*xx),y+(pixel_size*yy),pixel_size,pixel_size);
-        }
+          const int  xxx = dst_x+(pixel_size*xx);
 
-      else
-        {
-          dst.fill_rect(oat::const_color::blue,x+(pixel_size*xx),y+(pixel_size*yy),pixel_size,pixel_size);
+          auto  v = get_color(xx,yy);
+
+            if(v&8)
+            {
+              dst.fill_rect(palette[v&7],xxx,yyy,pixel_size,pixel_size);
+            }
         }
-    }}
+    }
 }
 
 

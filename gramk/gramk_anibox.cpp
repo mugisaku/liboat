@@ -114,7 +114,7 @@ render()
 
     if(list.size())
     {
-      list[current]->render(*this,pt.x,pt.y,Card::width,Card::height,pixel_size);
+      list[current]->render(Card::width,Card::height,*this,pt.x,pt.y,pixel_size);
     }
 
 

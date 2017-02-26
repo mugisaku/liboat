@@ -9,15 +9,11 @@ void
 Card::
 draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1)
 {
-  constexpr int  shift_amount = 22;
+/*
+  constexpr int  shift_amount = 24;
 
-  const int  x_min = std::min(p0.x,p1.x);
-  const int  x_max = std::max(p0.x,p1.x);
-  const int  y_min = std::min(p0.y,p1.y);
-  const int  y_max = std::max(p0.y,p1.y);
-
-  const int  x_dist = (x_max-x_min+1);
-  const int  y_dist = (y_max-y_min+1);
+  const int  x_dist = (p0.x < p1.x)? (p1.x-p0.x)+1:(p0.x-p1.x)+1;
+  const int  y_dist = (p0.y < p1.y)? (p1.y-p0.y)+1:(p0.y-p1.y)+1;
 
     if(!x_dist ||
        !y_dist)
@@ -25,9 +21,6 @@ draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1)
       return;
     }
 
-
-  int  x = (p0.x<<shift_amount);
-  int  y = (p0.y<<shift_amount);
 
   int  dist;
 
@@ -39,7 +32,7 @@ draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1)
       dist = y_dist;
 
       x_add_amount = (x_dist<<shift_amount)/y_dist;
-      y_add_amount = 1<<shift_amount;
+      y_add_amount = (     1<<shift_amount)       ;
     }
 
   else
@@ -47,7 +40,7 @@ draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1)
     {
       dist = x_dist;
 
-      x_add_amount = 1<<shift_amount;
+      x_add_amount = (     1<<shift_amount)       ;
       y_add_amount = (y_dist<<shift_amount)/x_dist;
     }
 
@@ -64,15 +57,43 @@ draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1)
     if(p0.y > p1.y){y_add_amount = -y_add_amount;}
 
 
+  int  x_val = (p0.x<<shift_amount);
+  int  y_val = (p0.y<<shift_amount);
+
     while(dist--)
     {
-      put_color(color,(x>>shift_amount),
-                      (y>>shift_amount));
+      const int  x = (x_val>>shift_amount);
+      const int  y = (y_val>>shift_amount);
 
-      x += x_add_amount;
-      y += y_add_amount;
+      put_color(color,x,y);
+
+        if((x == p1.x) &&
+           (y == p1.y))
+        {
+          break;
+        }
+
+
+      x_val += x_add_amount;
+      y_val += y_add_amount;
     }
-}
+*/
+int  x0 = p0.x;
+int  y0 = p0.y;
+int  x1 = p1.x;
+int  y1 = p1.y;
+
+   int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
+   int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+   int err = dx+dy, e2; /* error value e_xy */
+ 
+   for(;;){  /* loop */
+      put_color(color,x0,y0);
+      if (x0==x1 && y0==y1) break;
+      e2 = 2*err;
+      if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+      if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+   }}
 
 
 void

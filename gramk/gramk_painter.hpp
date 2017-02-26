@@ -52,9 +52,11 @@ Painter: public oat::Widget
 
   Callback  callback;
 
+  Card  copy_card;
   Rect  copy_rect;
 
-  Card       copy_card;
+  oat::Point  paste_point;
+
   Card  temporary_card;
 
   PaintingMode  mode;
@@ -64,8 +66,8 @@ Painter: public oat::Widget
   uint8_t  current_color;
 
   bool  single_pointing_flag;
-
-  bool  composing_flag;
+  bool         pointing_flag;
+  bool        composing_flag;
 
   oat::Point  point0;
   oat::Point  point1;
@@ -81,17 +83,16 @@ Painter: public oat::Widget
 
 
   Rect  operating_rect;
+  Rect  selecting_rect;
 
   void  draw_selecting_rect();
 
 
   void  fill_area(int  color, int  x, int  y);
 
-  void  paste(int  x, int  y, bool  rehearsal);
+  void  paste(int  x, int  y, bool  overwrite, bool  rehearsal);
 
   void  make_pointing(int  x, int  y);
-  void  form_rect();
-
   void  move_corner(int  x, int  y);
 
 public:
@@ -107,6 +108,7 @@ public:
   uint8_t  get_current_color() const;
 
   const Rect&  get_operating_rect() const;
+  const Rect&  get_selecting_rect() const;
 
   void  copy();
 
