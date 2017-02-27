@@ -30,6 +30,7 @@ PaintingMode
 {
   draw_point,
   draw_line,
+  draw_ellipse,
   draw_rect,
   fill_rect,
   fill_area,
@@ -57,7 +58,8 @@ Painter: public oat::Widget
 
   oat::Point  paste_point;
 
-  Card  temporary_card;
+  Card  tmp_card0;
+  Card  tmp_card1;
 
   PaintingMode  mode;
 
@@ -67,10 +69,11 @@ Painter: public oat::Widget
 
   bool  single_pointing_flag;
   bool         pointing_flag;
-  bool        composing_flag;
 
   oat::Point  point0;
   oat::Point  point1;
+
+  std::vector<oat::Point>  point_buffer;
 
   enum class Corner{
     none,

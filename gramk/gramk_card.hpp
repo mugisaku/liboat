@@ -67,10 +67,6 @@ public:
   void  shift_right( const Rect&  rect, bool  rotate=false);
   void  shift_down(  const Rect&  rect, bool  rotate=false);
 
-  void  draw_line(int  color, const oat::Point&  p0, const oat::Point&  p1);
-  void  draw_rect(int  color, const Rect&  rect);
-  void  fill_rect(int  color, const Rect&  rect);
-
   void  fill_area(int  color, int  x, int  y);
 
 

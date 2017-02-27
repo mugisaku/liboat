@@ -27,6 +27,7 @@ create_mode_widget()
 {
   auto  frm = new oat::RadioForm({new oat::Text(u"点を打つ"),
                                   new oat::Text(u"線を引く"),
+                                  new oat::Text(u"楕円を引く"),
                                   new oat::Text(u"矩形を引く"),
                                   new oat::Text(u"矩形を塗る"),
                                   new oat::Text(u"領域を塗りつぶす"),

@@ -193,10 +193,11 @@ construct_widgets()
   auto  ctrl = anibox->create_ctrl_widget();
 
 
+  auto  abox = new TableRow({anibox,ctrl});
+  auto  bbox = new TableColumn({abox,plte});
+  auto  cbox = new TableRow({mode,bbox});
 
-  auto  abox = new TableRow({mode,anibox,ctrl});
-
-  auto  left = new TableRow({painter,new TableColumn({plte,abox,oper})});
+  auto  left = new TableRow({painter,new TableColumn({cbox,oper})});
 
   master.join(new TableRow({left,right}),0,0);
 

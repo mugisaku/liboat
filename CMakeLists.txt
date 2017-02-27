@@ -52,10 +52,10 @@ set(OAT_SOURCES
 
 
 set(GRAMK_SOURCES
+  gramk/gramk_drawing.cpp
   gramk/gramk_rect.cpp
   gramk/gramk_card.cpp
   gramk/gramk_card__log.cpp
-  gramk/gramk_card__draw.cpp
   gramk/gramk_card__operate.cpp
   gramk/gramk_card__fill_area.cpp
   gramk/gramk_painter.cpp

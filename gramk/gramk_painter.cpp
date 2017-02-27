@@ -1,4 +1,5 @@
 #include"gramk_painter.hpp"
+#include"gramk_drawing.hpp"
 #include<cstring>
 #include<algorithm>
 
@@ -31,6 +32,8 @@ change_target(Card&  card)
 {
   target = &card;
 
+  point_buffer.clear();
+
   need_to_redraw();
 }
 
@@ -61,8 +64,9 @@ change_mode(PaintingMode  mode_)
     }
 
 
-   pointing_flag = false;
-  composing_flag = false;
+  pointing_flag = false;
+
+  point_buffer.clear();
 
   single_pointing_flag = ((mode == PaintingMode::draw_point) ||
                           (mode == PaintingMode::fill_area)  ||
@@ -114,28 +118,25 @@ make_pointing(int  x, int  y)
     {
       point1.reset(x,y);
 
-      Card::transfer(*target,Card::whole_rect,temporary_card,0,0,true);
+      point_buffer.clear();
 
         switch(mode)
         {
       case(PaintingMode::draw_line):
-          composing_flag = true;
-
-          temporary_card.draw_line(current_color|8,point0,point1);
+          ::draw_line(point0,point1,point_buffer);
+          break;
+      case(PaintingMode::draw_ellipse):
+          ::draw_ellipse(point0,point1,point_buffer);
           break;
       case(PaintingMode::draw_rect):
-          composing_flag = true;
-
           operating_rect.form(point0,point1);
 
-          temporary_card.draw_rect(current_color|8,operating_rect);
+          operating_rect.draw(point_buffer);
           break;
       case(PaintingMode::fill_rect):
-          composing_flag = true;
-
           operating_rect.form(point0,point1);
 
-          temporary_card.fill_rect(current_color|8,operating_rect);
+          operating_rect.fill(point_buffer);
           break;
       case(PaintingMode::transform_area_frame):
           selecting_rect.form(point0,point1);
@@ -155,7 +156,7 @@ copy()
 {
   copy_card.clear();
 
-  auto&  rect = selecting_rect;
+  auto&  rect = get_selecting_rect();
 
   Card::transfer(*target,rect,copy_card,0,0,true);
 
@@ -168,17 +169,9 @@ void
 Painter::
 paste(int  x, int  y, bool  overwrite, bool  rehearsal)
 {
-  composing_flag = true;
-
   paste_point.reset(x,y);
 
-    if(rehearsal)
-    {
-      Card::transfer(  *target,Card::whole_rect,temporary_card,0,0,true);
-      Card::transfer(copy_card,       copy_rect,temporary_card,x,y,overwrite);
-    }
-
-  else
+    if(!rehearsal)
     {
       target->prepare_new_log();
 
@@ -263,25 +256,20 @@ process_mouse(const oat::Mouse&  mouse)
         switch(mode)
         {
       case(PaintingMode::draw_line):
-          target->prepare_new_log();
-
-          target->draw_line(current_color|8,point0,point1);
-
-          target->prepare_new_log(true);
-          break;
+      case(PaintingMode::draw_ellipse):
       case(PaintingMode::draw_rect):
-          target->prepare_new_log();
-
-          target->draw_rect(current_color|8,operating_rect);
-
-          target->prepare_new_log(true);
-          break;
       case(PaintingMode::fill_rect):
           target->prepare_new_log();
 
-          target->fill_rect(current_color|8,operating_rect);
+            for(auto&  pt: point_buffer)
+            {
+              target->put_color(current_color|8,pt.x,pt.y);
+            }
+
 
           target->prepare_new_log(true);
+
+          point_buffer.clear();
           break;
       case(PaintingMode::transform_area_frame):
           selecting_state = 2;
@@ -291,8 +279,7 @@ process_mouse(const oat::Mouse&  mouse)
         }
 
 
-       pointing_flag = false;
-      composing_flag = false;
+      pointing_flag = false;
     }
 
 
@@ -363,16 +350,19 @@ render()
   constexpr int  h = Card::height;
 
 
-    if(composing_flag)
+  Card::transfer(*target,Card::whole_rect,tmp_card0,0,0,true);
+
+    for(auto&  pt: point_buffer)
     {
-      temporary_card.render(Card::width,Card::height,*this,pt.x,pt.y,pixel_size);
+      tmp_card0.put_color(current_color|8,pt.x,pt.y);
     }
 
-  else
-    {
-      target->render(Card::width,Card::height,*this,pt.x,pt.y,pixel_size);
-    }
 
+       if(mode == PaintingMode::paste){Card::transfer(copy_card,copy_rect,tmp_card0,paste_point.x,paste_point.y,true );}
+  else if(mode == PaintingMode::layer){Card::transfer(copy_card,copy_rect,tmp_card0,paste_point.x,paste_point.y,false);}
+
+
+  tmp_card0.render(w,h,*this,pt.x,pt.y,pixel_size);
 
     for(int  y = 0;  y < h;  ++y)
     {

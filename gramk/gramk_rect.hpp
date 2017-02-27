@@ -24,6 +24,9 @@ Rect
 
   void  form(const oat::Point&  p0, const oat::Point&  p1);
 
+  void  draw(std::vector<oat::Point>&  buf) const;
+  void  fill(std::vector<oat::Point>&  buf) const;
+
 };
 
 

@@ -28,7 +28,7 @@ make_color(uint8_t  l)
 png_color
 png_palette[] =
 {
-  make_color(0x1F),
+  {0,0,0xFF},
   make_color(0x3F),
   make_color(0x5F),
   make_color(0x7F),

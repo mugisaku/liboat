@@ -22,3 +22,36 @@ form(const oat::Point&  p0, const oat::Point&  p1)
 
 
 
+void
+Rect::
+draw(std::vector<oat::Point>&  buf) const
+{
+    for(int  xx = 0;  xx < w;  ++xx)
+    {
+      buf.emplace_back(x+xx,y    );
+      buf.emplace_back(x+xx,y+h-1);
+    }
+
+
+    for(int  yy = 1;  yy < h-1;  ++yy)
+    {
+      buf.emplace_back(x    ,y+yy);
+      buf.emplace_back(x+w-1,y+yy);
+    }
+}
+
+
+void
+Rect::
+fill(std::vector<oat::Point>&  buf) const
+{
+    for(int  yy = 0;  yy < h;  ++yy){
+    for(int  xx = 0;  xx < w;  ++xx){
+      buf.emplace_back(x+xx,y+yy);
+    }}
+}
+
+
+
+
+
