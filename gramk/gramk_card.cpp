@@ -52,7 +52,7 @@ Card::
 Card(bool  rec):
 recording_flag(rec)
 {
-  clear(false);
+  clear();
 }
 
 
@@ -69,6 +69,8 @@ Card&
 Card::
 operator=(const Card&  rhs)
 {
+  clear();
+
   std::memcpy(&color_table,&rhs.color_table,sizeof(color_table));
 
   recording_flag = rhs.recording_flag;
@@ -103,27 +105,13 @@ put_color(uint8_t  color, int  x, int  y)
 
 void
 Card::
-clear(bool  perfectly)
+clear()
 {
-    if(!perfectly)
-    {
-      prepare_new_log();
-    }
-
-
   std::memset(&color_table,0,sizeof(color_table));
 
-    if(!perfectly)
-    {
-      prepare_new_log(true);
-    }
+  log_list.clear();
 
-  else
-    {
-      log_list.clear();
-
-      operation_log.clear();
-    }
+  operation_log.clear();
 }
 
 

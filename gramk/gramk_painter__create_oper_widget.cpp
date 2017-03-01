@@ -32,7 +32,7 @@ clear_selection(Button&  btn)
 
     if(btn->test_unpressed())
     {
-//      p.clear_selection();
+      p.clear_selection();
 
       p.need_to_redraw();
     }
@@ -58,7 +58,7 @@ clear_image(Button&  btn)
 
     if(btn->test_unpressed())
     {
-//      p.get_target()->fill(0);
+      p.clear_image();
 
       p.need_to_redraw();
     }
@@ -248,8 +248,8 @@ create_oper_widget()
 {
   auto  und_btn = new Button(new Text(u"アンドゥ"),undo);
   auto  cpy_btn = new Button(new Text(u"コピー"),::copy);
-  auto  rse_btn = new Button(new Text(u"選択解除"),clear_selection);
-  auto  clr_btn = new Button(new Text(u"クリア"),clear_image);
+  auto  rse_btn = new Button(new Text(u"選択解除"),::clear_selection);
+  auto  clr_btn = new Button(new Text(u"クリア"),::clear_image);
 
   auto  rvl_btn = new Button(new Text(u"右回転"),revolve);
   auto  rvh_btn = new Button(new Text(u"水平反転"),reverse_horizontally);

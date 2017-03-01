@@ -96,7 +96,29 @@ const Rect&
 Painter::
 get_selecting_rect() const
 {
-  return selecting_state? selecting_rect:Card::whole_rect;
+  return (selecting_state == 2)? selecting_rect:Card::whole_rect;
+}
+
+
+void
+Painter::
+clear_selection()
+{
+  selecting_state = 0;
+
+  pointing_flag = false;
+
+  need_to_redraw();
+}
+
+
+void
+Painter::
+clear_image()
+{
+  target->clear();
+
+  need_to_redraw();
 }
 
 
@@ -143,6 +165,7 @@ make_pointing(int  x, int  y)
 
           selecting_state = 1;
           break;
+      default:;
         }
     }
 }
@@ -229,6 +252,7 @@ process_mouse(const oat::Mouse&  mouse)
             if(mouse.left.test_unpressed()){paste(x,y,false,false);}
           else                             {paste(x,y,false,true );}
           break;
+      default:;
         }
     }
 
@@ -276,6 +300,7 @@ process_mouse(const oat::Mouse&  mouse)
 
           rect_corner = Corner::none;
           break;
+      default:;
         }
 
 

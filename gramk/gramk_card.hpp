@@ -45,7 +45,7 @@ public:
   void     put_color(uint8_t  color, int  x, int  y)      ;
 
 
-  void  clear(bool  perfectly=false);
+  void  clear();
 
   void    set_recording_flag();
   void  unset_recording_flag();

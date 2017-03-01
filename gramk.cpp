@@ -229,18 +229,16 @@ main_loop()
 
     while(SDL_PollEvent(&evt))
     {
-      int  mouse_flag = false;
-
         switch(evt.type)
         {
           case(SDL_MOUSEBUTTONUP):
           case(SDL_MOUSEBUTTONDOWN):
             process_mouse_button(evt.button);
-            mouse_flag = true;
+            master.process(mouse);
             break;
           case(SDL_MOUSEMOTION):
             process_mouse_motion(evt.motion);
-            mouse_flag = true;
+            master.process(mouse);
             break;
           case(SDL_WINDOWEVENT):
             process_window(evt.window);
@@ -258,12 +256,7 @@ main_loop()
         }
 
 
-        if(mouse_flag)
-        {
-          master.process(mouse);
-
-          ButtonModule::unset_shortlived_all();
-        }
+      ButtonModule::unset_shortlived_all();
     }
 
 

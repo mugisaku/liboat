@@ -115,6 +115,9 @@ public:
 
   void  copy();
 
+  void  clear_selection();
+  void  clear_image();
+
   void  process_mouse(const oat::Mouse&  mouse) override;
   void  render() override;
 

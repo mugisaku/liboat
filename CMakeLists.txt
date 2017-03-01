@@ -11,15 +11,26 @@ endif(CCACHE_FOUND)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_BUILD_TYPE Debug)
 
+
 set(CMAKE_C_COMPILER  gcc)
-set(CMAKE_C_FLAGS   "-std=c11 -Werror -march=core2")
-set(CMAKE_C_FLAGS_RELEASE "-Os -fomit-frame-pointer")
-set(CMAKE_C_FLAGS_DEBUG   "-Og -g")
+set(CMAKE_C_FLAGS   "-std=c11 -Werror")
 set(CMAKE_CXX_COMPILER  g++)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Werror -march=core2")
-set(CMAKE_CXX_FLAGS_RELEASE "-Os -fomit-frame-pointer")
-set(CMAKE_CXX_FLAGS_DEBUG   "-Og -g")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Werror")
 set(CMAKE_CXX_LINK_FLAGS  "-lstdc++ -lz -lpng -lSDL2 -lSDL2main")
+
+
+set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS}   -O2 -march=core2 -fomit-frame-pointer")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -march=core2 -fomit-frame-pointer")
+set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS}   -Og -g")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS} -Og -g")
+
+
+if(EMSCRIPTEN)
+  set(EXECUTABLE_EXTENSION ".html")
+  set(CMAKE_CXX_COMPILER  em++)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+  set(CMAKE_CXX_LINK_FLAGS  "${CMAKE_CXX_LINK_FLAGS} -s USE_SDL=2 --embed-file font.bin")
+endif()
 
 
 
@@ -72,7 +83,7 @@ set(GRAMK_SOURCES
 
 include_directories(./core)
 include_directories(./gramk)
-add_executable(Gramk gramk.cpp ${OAT_SOURCES} ${GRAMK_SOURCES})
+add_executable("Gramk${EXECUTABLE_EXTENSION}" gramk.cpp ${OAT_SOURCES} ${GRAMK_SOURCES})
 
 
 
