@@ -9,13 +9,17 @@ endif(CCACHE_FOUND)
 
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_BUILD_TYPE Debug)
+
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 
 set(CMAKE_C_COMPILER  gcc)
-set(CMAKE_C_FLAGS   "-std=c11 -Werror")
+set(CMAKE_C_FLAGS   "-std=c14 -Werror")
 set(CMAKE_CXX_COMPILER  g++)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Werror")
+set(CMAKE_CXX_FLAGS "-std=c++14 -Werror")
 set(CMAKE_CXX_LINK_FLAGS  "-lstdc++ -lz -lpng -lSDL2 -lSDL2main")
 
 
@@ -28,7 +32,8 @@ set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS} -Og -g")
 if(EMSCRIPTEN)
   set(EXECUTABLE_EXTENSION ".html")
   set(CMAKE_CXX_COMPILER  em++)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+  set(CMAKE_CXX_FLAGS "-std=c++14 -Werror -O2")
+  set(CMAKE_CXX_FLAGS_DEBUG "")
   set(CMAKE_CXX_LINK_FLAGS  "${CMAKE_CXX_LINK_FLAGS} -s USE_SDL=2 --embed-file font.bin")
 endif()
 
@@ -76,6 +81,7 @@ set(GRAMK_SOURCES
   gramk/gramk_painter__create_palette_widget.cpp
   gramk/gramk_album.cpp
   gramk/gramk_album__file.cpp
+  gramk/gramk_album__create_operator_widget.cpp
   gramk/gramk_anibox.cpp
   gramk/gramk_pathholder.cpp
 )

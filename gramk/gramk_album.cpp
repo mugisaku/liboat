@@ -45,6 +45,12 @@ process_mouse(const oat::Mouse&  mouse)
 }
 
 
+Card&
+Album::
+get_card(int  x, int  y) const
+{
+  return *table[(table_width*y)+x];
+}
 
 
 void
@@ -76,6 +82,51 @@ get_current() const
   return table[(table_width*cursor.y)+cursor.x];
 }
 
+
+
+
+void
+Album::
+insert_column()
+{
+    for(int  y =             0;  y < table_height;  ++y){
+    for(int  x = table_width-1;  x >     cursor.x;  --x){
+      get_card(x,y) = get_card(x-1,y);
+    }}
+}
+
+
+void
+Album::
+remove_column()
+{
+    for(int  y =        0;  y < table_height ;  ++y){
+    for(int  x = cursor.x;  x < table_width-1;  ++x){
+      get_card(x,y) = get_card(x+1,y);
+    }}
+}
+
+
+void
+Album::
+insert_row()
+{
+    for(int  x =              0;  x < table_width;  ++x){
+    for(int  y = table_height-1;  y >    cursor.y;  --y){
+      get_card(x,y) = get_card(x,y-1);
+    }}
+}
+
+
+void
+Album::
+remove_row()
+{
+    for(int  x =        0;  x < table_width   ;  ++x){
+    for(int  y = cursor.y;  y < table_height-1;  ++y){
+      get_card(x,y) = get_card(x,y+1);
+    }}
+}
 
 
 

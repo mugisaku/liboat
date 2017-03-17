@@ -185,7 +185,7 @@ construct_widgets()
   album = new Album(album_callback);
   pathho = new PathHolder();
 
-  auto  right = new TableColumn({album,pathho,button});
+  auto  right = new TableColumn({album,pathho,button,album->create_operator_widget()});
 
 
   anibox = new AniBox(anibox_callback);

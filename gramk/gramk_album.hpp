@@ -32,7 +32,18 @@ public:
   void   read(FILE*  f);
   void  write(FILE*  f);
 
+  void  insert_column();
+  void  remove_column();
+
+  void  insert_row();
+  void  remove_row();
+
+  Card&  get_card(int  x, int  y) const;
+
   const Card*  get_current() const;
+
+
+  oat::Widget*  create_operator_widget();
 
 };
 
