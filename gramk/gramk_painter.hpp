@@ -53,13 +53,13 @@ Painter: public oat::Widget
 
   Callback  callback;
 
-  Card  copy_card;
-  Rect  copy_rect;
+  Card*  copy_card;
+  Rect   copy_rect;
 
   oat::Point  paste_point;
 
-  Card  tmp_card0;
-  Card  tmp_card1;
+  Card*  tmp_card0;
+  Card*  tmp_card1;
 
   PaintingMode  mode;
 

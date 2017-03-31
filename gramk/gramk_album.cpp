@@ -4,6 +4,21 @@
 
 
 
+int  Album::table_width ;
+int  Album::table_height;
+
+
+void
+Album::
+reset_size(int  w, int  h)
+{
+  table_width  = w;
+  table_height = h;
+}
+
+
+
+
 Album::
 Album(Callback  cb):
 callback(cb)

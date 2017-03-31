@@ -19,7 +19,7 @@ RESTART:
     {
       auto&  dot = operation_log.back();
 
-      color_table[dot.y][dot.x] = dot.color;
+      color_table[(width*dot.y)+dot.x] = dot.color;
 
       operation_log.pop_back();
     }
@@ -36,7 +36,7 @@ RESTART:
 
             while(it != end)
             {
-              color_table[it->y][it->x] = it->color;
+              color_table[(width*it->y)+it->x] = it->color;
 
               ++it;
             }

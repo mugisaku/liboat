@@ -13,7 +13,10 @@ callback(cb),
 current_color(0),
 operating_rect(0,0,Card::width,Card::height),
 selecting_state(0),
-rect_corner(Corner::none)
+rect_corner(Corner::none),
+copy_card(new Card),
+tmp_card0(new Card),
+tmp_card1(new Card)
 {
   change_content_width( Card::width *pixel_size);
   change_content_height(Card::height*pixel_size);
@@ -177,11 +180,11 @@ void
 Painter::
 copy()
 {
-  copy_card.clear();
+  copy_card->clear();
 
   auto&  rect = get_selecting_rect();
 
-  Card::transfer(*target,rect,copy_card,0,0,true);
+  Card::transfer(*target,rect,*copy_card,0,0,true);
 
   copy_rect.w = rect.w;
   copy_rect.h = rect.h;
@@ -198,7 +201,7 @@ paste(int  x, int  y, bool  overwrite, bool  rehearsal)
     {
       target->prepare_new_log();
 
-      Card::transfer(copy_card,copy_rect,*target,x,y,overwrite);
+      Card::transfer(*copy_card,copy_rect,*target,x,y,overwrite);
 
       target->prepare_new_log(true);
     }
@@ -371,23 +374,23 @@ render()
   constexpr oat::Color  l1(0x7F,0x7F,0x0);
   constexpr oat::Color  l2(0xFF,0xFF,0x00);
 
-  constexpr int  w = Card::width ;
-  constexpr int  h = Card::height;
+  int  w = Card::width ;
+  int  h = Card::height;
 
 
-  Card::transfer(*target,Card::whole_rect,tmp_card0,0,0,true);
+  Card::transfer(*target,Card::whole_rect,*tmp_card0,0,0,true);
 
     for(auto&  pt: point_buffer)
     {
-      tmp_card0.put_color(current_color|8,pt.x,pt.y);
+      tmp_card0->put_color(current_color|8,pt.x,pt.y);
     }
 
 
-       if(mode == PaintingMode::paste){Card::transfer(copy_card,copy_rect,tmp_card0,paste_point.x,paste_point.y,true );}
-  else if(mode == PaintingMode::layer){Card::transfer(copy_card,copy_rect,tmp_card0,paste_point.x,paste_point.y,false);}
+       if(mode == PaintingMode::paste){Card::transfer(*copy_card,copy_rect,*tmp_card0,paste_point.x,paste_point.y,true );}
+  else if(mode == PaintingMode::layer){Card::transfer(*copy_card,copy_rect,*tmp_card0,paste_point.x,paste_point.y,false);}
 
 
-  tmp_card0.render(w,h,*this,pt.x,pt.y,pixel_size);
+  tmp_card0->render(w,h,*this,pt.x,pt.y,pixel_size);
 
     for(int  y = 0;  y < h;  ++y)
     {

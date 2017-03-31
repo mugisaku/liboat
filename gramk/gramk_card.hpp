@@ -3,6 +3,7 @@
 
 
 #include<cstdint>
+#include<vector>
 #include"oat.hpp"
 #include"gramk_packet.hpp"
 #include"gramk_rect.hpp"
@@ -15,13 +16,15 @@ class
 Card
 {
 public:
-  static constexpr int  width  = 24;
-  static constexpr int  height = 48;
+  static int   width;
+  static int  height;
 
-  static const Rect  whole_rect;
+  static Rect  whole_rect;
+
+  static void  reset_size(int  w, int  h);
 
 protected:
-  uint8_t  color_table[height][width];
+  std::vector<uint8_t>  color_table;
 
   bool  recording_flag;
 

@@ -5,9 +5,25 @@
 
 
 
-const Rect
+Rect
 Card::
-whole_rect = Rect(0,0,width,height);
+whole_rect;
+
+
+int  Card::width ;
+int  Card::height;
+
+
+void
+Card::
+reset_size(int  w, int  h)
+{
+  width  = w;
+  height = h;
+
+  whole_rect.w = w;
+  whole_rect.h = h;
+}
 
 
 void
@@ -71,7 +87,7 @@ operator=(const Card&  rhs)
 {
   clear();
 
-  std::memcpy(&color_table,&rhs.color_table,sizeof(color_table));
+  color_table = rhs.color_table;
 
   recording_flag = rhs.recording_flag;
 
@@ -81,14 +97,14 @@ operator=(const Card&  rhs)
 
 
 
-uint8_t  Card::get_color(int  x, int  y) const{return color_table[y][x];}
+uint8_t  Card::get_color(int  x, int  y) const{return color_table[(width*y)+x];}
 
 
 void
 Card::
 put_color(uint8_t  color, int  x, int  y)
 {
-  auto&  now = color_table[y][x];
+  auto&  now = color_table[(width*y)+x];
 
     if(now != color)
     {
@@ -107,7 +123,9 @@ void
 Card::
 clear()
 {
-  std::memset(&color_table,0,sizeof(color_table));
+  color_table.resize(width*height);
+
+  std::fill(color_table.begin(),color_table.end(),0);
 
   log_list.clear();
 

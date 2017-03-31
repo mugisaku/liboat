@@ -13,8 +13,8 @@
 class
 Album: public oat::Widget
 {
-  static constexpr int table_width  = 12;
-  static constexpr int table_height =  8;
+  static int  table_width ;
+  static int  table_height;
 
 
   Callback  callback;
@@ -24,6 +24,8 @@ Album: public oat::Widget
   std::vector<Card*>  table;
 
 public:
+  static void  reset_size(int  w, int  h);
+
   Album(Callback  cb);
 
   void  process_mouse(const oat::Mouse&  mouse) override;

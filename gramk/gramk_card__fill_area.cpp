@@ -7,8 +7,8 @@
 namespace{
 
 
-bool
-table[Card::height][Card::width];
+std::vector<uint8_t>
+table;
 
 
 }
@@ -18,7 +18,7 @@ void
 Card::
 subroutine_for_fill_area(int  color, int  x, int  y, int  target)
 {
-  auto&  e = table[y][x];
+  auto&  e = table[(width*y)+x];
 
     if(!e)
     {
@@ -42,11 +42,13 @@ void
 Card::
 fill_area(int  color, int  x, int  y)
 {
+  table.resize(width*height);
+
   auto  target = get_color(x,y);
 
     if(target != color)
     {
-      std::memset(&table,0,sizeof(table));
+      std::fill(table.begin(),table.end(),0);
 
       prepare_new_log();
 

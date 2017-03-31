@@ -161,8 +161,19 @@ anibox_callback()
 
 
 void
-construct_widgets()
+construct_widgets(const char*  fmt)
 {
+  int   cw = 24;
+  int   ch = 48;
+  int  atw =  8;
+  int  ath =  6;
+
+  sscanf(fmt," card = %d x %d  album = %d x %d",&cw,&ch,&atw,&ath);
+
+   Card::reset_size( cw, ch);
+  Album::reset_size(atw,ath);
+
+
   master.style.background_color = const_color::gray;
 
   default_style.background_color = const_color::dark_gray;
@@ -283,7 +294,7 @@ main_loop()
 int
 main(int  argc,  char**  argv)
 {
-  construct_widgets();
+  construct_widgets((argc != 1)? argv[1]:"");
 
   SDL_Init(SDL_INIT_VIDEO);
 
