@@ -16,7 +16,9 @@ selecting_state(0),
 rect_corner(Corner::none),
 copy_card(new Card),
 tmp_card0(new Card),
-tmp_card1(new Card)
+tmp_card1(new Card),
+base_card(nullptr),
+hide_base_flag(false)
 {
   change_content_width( Card::width *pixel_size);
   change_content_height(Card::height*pixel_size);
@@ -36,6 +38,26 @@ change_target(Card&  card)
   target = &card;
 
   point_buffer.clear();
+
+  need_to_redraw();
+}
+
+
+void
+Painter::
+change_base()
+{
+  base_card = target;
+
+  need_to_redraw();
+}
+
+
+void
+Painter::
+change_hide_base_flag(bool  v)
+{
+  hide_base_flag = v;
 
   need_to_redraw();
 }
@@ -377,8 +399,18 @@ render()
   int  w = Card::width ;
   int  h = Card::height;
 
+    if(hide_base_flag || !base_card)
+    {
+      Card::transfer(*target,Card::whole_rect,*tmp_card0,0,0,true);
+    }
 
-  Card::transfer(*target,Card::whole_rect,*tmp_card0,0,0,true);
+  else
+    if(base_card)
+    {
+      Card::transfer(*base_card,Card::whole_rect,*tmp_card0,0,0,true);
+      Card::transfer(   *target,Card::whole_rect,*tmp_card0,0,0,false);
+    }
+
 
     for(auto&  pt: point_buffer)
     {

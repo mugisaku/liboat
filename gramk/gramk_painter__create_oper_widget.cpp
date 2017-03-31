@@ -237,6 +237,31 @@ rotate_down(Button&  btn)
 }
 
 
+
+
+void
+change_base(Button&  btn)
+{
+  auto&  p = *static_cast<Painter*>(btn.get_userdata());
+
+    if(btn->test_unpressed())
+    {
+      p.change_base();
+    }
+}
+
+
+
+
+void
+hide_base(Button&  btn)
+{
+  auto&  p = *static_cast<Painter*>(btn.get_userdata());
+
+  p.change_hide_base_flag(btn->test_pressing());
+}
+
+
 }
 
 
@@ -268,6 +293,10 @@ create_oper_widget()
   auto  rod_btn = new Button(new Text(u"下へ"),rotate_down);
 
 
+  auto  chb_btn = new Button(new Text(u"下敷きに使う"),::change_base);
+  auto  hib_btn = new Button(new Text(u"下敷きを隠す"),hide_base);
+
+
   und_btn->set_userdata(this);
   cpy_btn->set_userdata(this);
   rse_btn->set_userdata(this);
@@ -284,11 +313,18 @@ create_oper_widget()
   rol_btn->set_userdata(this);
   ror_btn->set_userdata(this);
   rod_btn->set_userdata(this);
+  chb_btn->set_userdata(this);
+  hib_btn->set_userdata(this);
+
+  hib_btn->get_module().use_toggle();
+
+  auto   b_col = new TableColumn({chb_btn,hib_btn});
+  auto  sr_col = new TableColumn({new TableRow({new Text(u"シフト"),shu_btn,shl_btn,shr_btn,shd_btn}),
+                                  new TableRow({new Text(u"ローテ"),rou_btn,rol_btn,ror_btn,rod_btn})});
 
   return new TableColumn({new TableRow({und_btn,cpy_btn,rse_btn,clr_btn}),
                           new TableRow({rvl_btn,rvh_btn,rvv_btn,mrv_btn}),
-                          new TableRow({new Text(u"シフト"),shu_btn,shl_btn,shr_btn,shd_btn}),
-                          new TableRow({new Text(u"ローテ"),rou_btn,rol_btn,ror_btn,rod_btn}),
+                          new TableRow({sr_col,b_col}),
                         });
 }
 

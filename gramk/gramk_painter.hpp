@@ -61,6 +61,10 @@ Painter: public oat::Widget
   Card*  tmp_card0;
   Card*  tmp_card1;
 
+  const Card*  base_card;
+
+  bool  hide_base_flag;
+
   PaintingMode  mode;
 
   int  selecting_state;
@@ -102,6 +106,9 @@ public:
   Painter(Callback  cb);
 
   void  change_target(Card&  card);
+  void  change_base();
+
+  void  change_hide_base_flag(bool  v);
 
   void  change_current_color(uint8_t  color);
   void  change_mode(PaintingMode  mode_);
