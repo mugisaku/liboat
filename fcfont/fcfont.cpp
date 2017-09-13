@@ -175,68 +175,72 @@ reset_table()
 }
 
 
+namespace{
+void
+fputc_u16be(uint16_t  c, FILE*  f)
+{
+  fputc(c>>8,f);
+  fputc(c   ,f);
+}
+void
+fputc_u32be(uint32_t  c, FILE*  f)
+{
+  fputc(c>>24,f);
+  fputc(c>>16,f);
+  fputc(c>> 8,f);
+  fputc(c    ,f);
+}
+}
+
+
 void
 Combined::
 print_table(FILE*  f)
 {
-  fprintf(f,"//combineds\n");
+  fputc( 8,f);
+  fputc(12,f);
+  fputc( 1,f);
+
+  fpos_t  pos;
+
+  fgetpos(f,&pos);
+
+  fputc_u16be(0,f);
+
+  int  n = 0;
 
     for(auto  ptr: pointer_table)
     {
-        if(!ptr)
-        {
-          continue;
-        }
-
-
-      auto&  c = *ptr;
-
-        if(is_private_use_area(c.unicode))
-        {
-          fprintf(f,"{0x%04X,",c.unicode);
-        }
-
-      else
-        {
-          char  buf[4];
-
-          encode(c.unicode,buf);
-
-          fprintf(f,"{u\'%s\',",buf);
-        }
-
-
-      fprintf(f,"0x%04X,0x%04X},\n",c.upper,c.lower);
-    }
-
-
-    for(auto&  c: table)
-    {
-      auto  ptr = pointer_table[c.unicode];
-
         if(ptr)
         {
-          continue;
+          auto  u = Character::pointer_table[ptr->upper];
+          auto  l = Character::pointer_table[ptr->lower];
+
+            if(u && l)
+            {
+              ++n;
+
+              fputc_u16be(ptr->unicode,f);
+
+                for(int  y = 4;  y < 8;  ++y)
+                {
+                  fputc(u->data[y],f);
+                }
+
+
+                for(int  y = 0;  y < 8;  ++y)
+                {
+                  fputc(l->data[y],f);
+                }
+            }
         }
-
-
-        if(is_private_use_area(c.unicode))
-        {
-          fprintf(f,"{0x%04X,",c.unicode);
-        }
-
-      else
-        {
-          char  buf[4];
-
-          encode(c.unicode,buf);
-
-          fprintf(f,"{u\'%s\',",buf);
-        }
-
-
-      fprintf(f,"0x%04X,0x%04X},\n",u' ',c.unicode);
     }
+
+
+
+  fsetpos(f,&pos);
+
+  fputc_u16be(n,f);
 }
 
 

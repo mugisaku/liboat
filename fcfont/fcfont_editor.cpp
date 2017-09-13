@@ -69,22 +69,22 @@ save(Button&  btn)
 {
     if(btn.get_module().test_unpressed())
     {
-      static int  n;
+      auto  src = fopen("__FCFONT_SRC.txt","wb");
+      auto  pro = fopen("__FCFONT_PRO.bin","wb");
 
-      char  buf[256];
-
-      snprintf(buf,sizeof(buf),"__FCFONT_%03d.txt",n++);
-
-      auto  f = fopen(buf,"wb");
-
-        if(f)
+        if(src)
         {
-          Character::print_table(f);
-          Character::print_table();
-           Combined::print_table(f);
-           Combined::print_table();
+          Character::print_table(src);
 
-          fclose(f);
+          fclose(src);
+        }
+
+
+        if(pro)
+        {
+          Combined::print_table(pro);
+
+          fclose(pro);
         }
     }
 }

@@ -87,9 +87,20 @@ set(GRAMK_SOURCES
 )
 
 
+set(FCFONT_SOURCES
+  fcfont/fcfont_charactereditor.cpp
+  fcfont/fcfont_characterselector.cpp
+  fcfont/fcfont_combinedselector.cpp
+  fcfont/fcfont_editor.cpp
+  fcfont/fcfont_sample.cpp
+  fcfont/fcfont.cpp
+)
+
+
 include_directories(./core)
 include_directories(./gramk)
 add_executable("Gramk${EXECUTABLE_EXTENSION}" gramk.cpp ${OAT_SOURCES} ${GRAMK_SOURCES})
+add_executable("Edfont${EXECUTABLE_EXTENSION}" edfont.cpp ${OAT_SOURCES} ${FCFONT_SOURCES})
 
 
 
