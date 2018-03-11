@@ -253,7 +253,7 @@ process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
     {
         for(int  y = 0;  y < H-1;  ++y)
         {
-            if(bitmap[y+1][x] == 1)
+            if(!bitmap[y][x] && (bitmap[y+1][x] == 1))
             {
               bitmap[y][x] = 2;
             }
@@ -262,7 +262,7 @@ process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
 
         for(int  y = H-1;  y > 0;  --y)
         {
-            if(bitmap[y-1][x] == 1)
+            if(!bitmap[y][x] && (bitmap[y-1][x] == 1))
             {
               bitmap[y][x] = 3;
             }
@@ -274,7 +274,7 @@ process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
     {
         for(int  x = 0;  x < W-1;  ++x)
         {
-            if(bitmap[y][x+1] == 1)
+            if(!bitmap[y][x] && (bitmap[y][x+1] == 1))
             {
               bitmap[y][x] = 2;
             }
@@ -283,7 +283,7 @@ process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
 
         for(int  x = W-1;  x > 0;  --x)
         {
-            if(bitmap[y][x-1] == 1)
+            if(!bitmap[y][x] && (bitmap[y][x-1] == 1))
             {
               bitmap[y][x] = 3;
             }
@@ -299,7 +299,7 @@ process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
 
         for(int  x = 0;  x < W;  ++x)
         {
-          v |= (bitmap[y][x+1]>>(2*x));
+          v |= ((bitmap[y][x]<<14)>>(2*x));
         }
 
 
