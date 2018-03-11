@@ -69,8 +69,9 @@ save(Button&  btn)
 {
     if(btn.get_module().test_unpressed())
     {
-      auto  src = fopen("__FCFONT_SRC.txt","wb");
-      auto  pro = fopen("__FCFONT_PRO.bin","wb");
+      auto  src  = fopen("__FCFONT_SRC.txt","wb");
+      auto  pro  = fopen("__FCFONT_PRO.bin","wb");
+      auto  pro2 = fopen("__FCFONT.cpp","wb");
 
         if(src)
         {
@@ -85,6 +86,14 @@ save(Button&  btn)
           Combined::print_table(pro);
 
           fclose(pro);
+        }
+
+
+        if(pro2)
+        {
+          Combined::print_table2(pro2);
+
+          fclose(pro2);
         }
     }
 }
@@ -110,8 +119,6 @@ cmb_update(void*  ptr)
   auto&  ed = *static_cast<Editor*>(ptr);
 
   ed.cmb_cp_text->change_string(ed.cmb_selector->get_buffer());
-
-  ed.sample->change(ed.cmb_selector->get()->unicode);
 }
 
 

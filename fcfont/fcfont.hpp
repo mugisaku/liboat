@@ -48,6 +48,7 @@ Combined
 
   static void  reset_table();
   static void  print_table(FILE*  f=stdout);
+  static void  print_table2(FILE*  f=stdout);
 
 };
 

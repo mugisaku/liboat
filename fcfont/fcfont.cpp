@@ -244,6 +244,129 @@ print_table(FILE*  f)
 }
 
 
+namespace{
+template<typename  T, int  W, int  H>
+void
+process(int  unicode, T  (&bitmap)[H][W], FILE*  f) noexcept
+{
+    for(int  x = 0;  x < W;  ++x)
+    {
+        for(int  y = 0;  y < H-1;  ++y)
+        {
+            if(bitmap[y+1][x] == 1)
+            {
+              bitmap[y][x] = 2;
+            }
+        }
+
+
+        for(int  y = H-1;  y > 0;  --y)
+        {
+            if(bitmap[y-1][x] == 1)
+            {
+              bitmap[y][x] = 3;
+            }
+        }
+    }
+
+
+    for(int  y = 0;  y < H;  ++y)
+    {
+        for(int  x = 0;  x < W-1;  ++x)
+        {
+            if(bitmap[y][x+1] == 1)
+            {
+              bitmap[y][x] = 2;
+            }
+        }
+
+
+        for(int  x = W-1;  x > 0;  --x)
+        {
+            if(bitmap[y][x-1] == 1)
+            {
+              bitmap[y][x] = 3;
+            }
+        }
+    }
+
+
+  fprintf(f,"{0x%04X,{",unicode);
+
+    for(int  y = 0;  y < H;  ++y)
+    {
+      int  v = 0;
+
+        for(int  x = 0;  x < W;  ++x)
+        {
+          v |= (bitmap[y][x+1]>>(2*x));
+        }
+
+
+      fprintf(f,"0x%04X,",v);
+    }
+
+
+  fprintf(f,"}},\n");
+}
+}
+
+
+void
+Combined::
+print_table2(FILE*  f)
+{
+  int  unicode = 0;
+
+    for(auto  ptr: pointer_table)
+    {
+        if(ptr)
+        {
+          auto  u = Character::pointer_table[ptr->upper];
+          auto  l = Character::pointer_table[ptr->lower];
+
+            if(u && l)
+            {
+              uint8_t  bitmap[16][8] = {0};
+
+                for(int  y = 0;  y < 8;  ++y)
+                {
+                  auto  v = u->data[y];
+
+                    for(int  x = 0;  x < 8;  ++x)
+                    {
+                        if(v&(0x80>>x))
+                        {
+                          bitmap[y][x] = 1;
+                        }
+                    }
+                }
+
+
+                for(int  y = 0;  y < 8;  ++y)
+                {
+                  auto  v = l->data[y];
+
+                    for(int  x = 0;  x < 8;  ++x)
+                    {
+                        if(v&(0x80>>x))
+                        {
+                          bitmap[8+y][x] = 1;
+                        }
+                    }
+                }
+
+
+              process(unicode,bitmap,f);
+            }
+        }
+
+
+      ++unicode;
+    }
+}
+
+
 }
 
 
